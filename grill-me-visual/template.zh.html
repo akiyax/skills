@@ -152,7 +152,7 @@
     background: var(--clay-tint);
     border: 1px solid var(--clay);
     border-radius: 10px;
-    margin-bottom: 2.5rem;
+    margin: 1.5rem 0 1.25rem;
     box-shadow: 0 4px 24px rgba(201,100,66,.12);
     animation: doneAppear .55s cubic-bezier(.2,.8,.2,1) both;
   }
@@ -744,6 +744,12 @@
     padding: 0 0 .55rem;
     user-select: none;
   }
+  .panel-actions {
+    margin-left: auto;
+    display: flex;
+    gap: .65rem;
+    align-items: center;
+  }
 
   /* Sticky summary bar — title bar + progress + Reset/Copy, always visible */
   .summary-bar {
@@ -946,16 +952,14 @@
 
   .warn-row {
     display: none;
-    position: fixed;
-    left: 0; right: 0;
-    bottom: calc(2.85rem + env(safe-area-inset-bottom, 0px));  /* sits on top of .summary-bar */
-    z-index: 51;
     align-items: center;
-    gap: 1rem;
-    padding: .85rem clamp(1rem, 4vw, 2.25rem);
+    flex-wrap: wrap;
+    gap: .65rem 1rem;
+    padding: .65rem .85rem;
+    margin: 0 0 .6rem;
     background: var(--paper-deep);
-    border-top: 1px solid var(--clay);
-    border-bottom: 1px solid var(--pencil);
+    border: 1px solid var(--clay);
+    border-radius: 4px;
     font-family: var(--serif);
     font-size: .95rem;
     color: var(--ink);
@@ -1069,7 +1073,7 @@
           <div class="options">
 
             <button type="button" class="opt opt-rich" data-value="document" data-rec="1" data-label="A. Document 文档风">
-              <span class="opt-tags"><span class="opt-tag tag-current">当前</span><span class="opt-tag tag-rec">推荐</span></span>
+              <span class="opt-tags"><span class="opt-tag tag-current">当前</span></span>
               <div class="opt-preview" style="font-style:normal;">
                 <div class="mockup-frame" style="padding:.85rem .9rem;">
                   <div style="font-size:.62rem; color:var(--ink-faded); text-transform:uppercase; letter-spacing:.1em; margin-bottom:.4rem;">Assistant</div>
@@ -1163,7 +1167,6 @@
           <div class="options">
 
             <button type="button" class="opt opt-rich" data-value="cursor" data-rec="1" data-label="A. 光标闪烁">
-              <span class="opt-tags"><span class="opt-tag tag-rec">推荐</span></span>
               <div class="opt-preview" style="font-style:normal;">
                 <div class="mockup-frame" style="padding:1rem 1.1rem; display:flex; align-items:center; gap:.2rem; min-height:3.2rem;">
                   <span style="font-family:var(--sans); font-size:.92rem; color:var(--ink);">让我想想这个问题</span>
@@ -1273,7 +1276,6 @@ flowchart TD
             </button>
 
             <button type="button" class="opt opt-rich" data-value="auto-retry" data-rec="1" data-label="B. 自动指数退避（推荐）">
-              <span class="opt-tags"><span class="opt-tag tag-rec">推荐</span></span>
               <div class="opt-preview">
 <pre class="mermaid">
 flowchart TD
@@ -1347,7 +1349,6 @@ flowchart TD
           <div class="options">
 
             <button type="button" class="opt opt-rich" data-value="source-serif" data-rec="1" data-label="A. Source Serif 4（编辑温度）">
-              <span class="opt-tags"><span class="opt-tag tag-rec">推荐</span></span>
               <div class="opt-preview">
                 <div class="mockup-frame" style="padding:1.4rem 1rem; text-align:center; font-style:normal;">
                   <div style="font-family:'Source Serif 4', Georgia, serif; font-size:2.9rem; font-weight:600; color:var(--ink); line-height:1; letter-spacing:-.005em;">Aurora</div>
@@ -1427,7 +1428,6 @@ flowchart TD
           <div class="options">
 
             <button type="button" class="opt opt-rich" data-value="flat-array" data-rec="1" data-label="A. 扁平 role/content 数组">
-              <span class="opt-tags"><span class="opt-tag tag-rec">推荐</span></span>
               <div class="opt-preview">
                 <div class="code-snippet">
                   <div class="code-head"><span class="code-lang">typescript</span></div>
@@ -1522,7 +1522,6 @@ flowchart TD
           <div class="options">
 
             <button type="button" class="opt opt-rich" data-value="silent" data-rec="1" data-label="A. 静默等待">
-              <span class="opt-tags"><span class="opt-tag tag-rec">推荐</span></span>
               <div class="opt-preview" style="font-style:normal;">
                 <ul class="pros-cons">
                   <li class="pro">极简，零打扰；用户掌控开场</li>
@@ -1584,16 +1583,19 @@ flowchart TD
   <section class="output" id="output">
     <div class="panel-head">
       <h3>回答汇总</h3>
+      <div class="panel-actions">
+        <button type="button" class="reset-link" id="reset-md-btn" title="放弃手动修改，重新从选项生成">重置</button>
+        <button type="button" class="copy-link" id="copy-btn">复制</button>
+      </div>
+    </div>
+    <div class="warn-row" id="warn-row">
+      <span class="msg" id="warn-msg"></span>
+      <button type="button" class="ghost" id="warn-goto">去补答</button>
+      <button type="button" class="ghost" id="warn-force">仍然复制</button>
     </div>
     <div class="body"><textarea id="md-out" spellcheck="false" rows="1"></textarea></div>
   </section>
 </main>
-
-<div class="warn-row" id="warn-row">
-  <span class="msg" id="warn-msg"></span>
-  <button type="button" class="ghost" id="warn-goto">去补答</button>
-  <button type="button" class="ghost" id="warn-force">仍然复制</button>
-</div>
 
 <div class="summary-bar" id="summary-bar">
   <div class="progress-track" aria-hidden="true">
@@ -1601,8 +1603,6 @@ flowchart TD
   </div>
   <div class="summary-row">
     <span class="summary-label" id="progress">0 / 6</span>
-    <button type="button" class="reset-link" id="reset-md-btn" title="放弃手动修改，重新从选项生成">重置</button>
-    <button type="button" class="copy-link" id="copy-btn">复制</button>
   </div>
 </div>
 
@@ -1610,6 +1610,25 @@ flowchart TD
 <script>
 const TOPIC = "AI chat 对话界面";
 const ROUND = 1;
+
+// 所有面向用户的字符串。语言模板之间唯一应该不同的是这个 LANG 对象 +
+// <head> 里的 CDN URL（Google Fonts + Mermaid）。本 <script> 的其余部分
+// 必须在所有语言模板之间保持逐字节一致。
+const LANG = {
+  progressDone:   '✓ 完成',
+  mdHeading:      (round, topic) => `## Grill 回答 · 第 ${round} 轮 · ${topic}`,
+  mdCustom:       (val) => `- 自填: ${val}`,
+  mdChoice:       (val, label, rec) => `- 选择: \`${val}\` — ${label}${rec ? '（推荐）' : ''}`,
+  mdUnanswered:   '- _(未回答)_',
+  copyDefault:    '复制',
+  copyCopied:     '已复制',
+  copyFailed:     '失败 · 请手动 ⌘C',
+  doneCtaDefault: '复制答案 →',
+  doneCtaCopied:  '✓ 已复制 — 现在去粘回对话框',
+  warnSuffix:     ' 还没回答，仍要复制吗？',
+  warnJoin:       '、',
+  tagRec:         '推荐',
+};
 
 const dark = matchMedia('(prefers-color-scheme: dark)').matches;
 mermaid.initialize({
@@ -1634,6 +1653,24 @@ mermaid.initialize({
 });
 
 const cards = [...document.querySelectorAll('#questions .card')];
+
+// Auto-inject the "Recommended" tag whenever data-rec="1" is set, so each card
+// only needs one source of truth for the recommendation. Idempotent — skips
+// when a .tag-rec span already exists.
+for (const recBtn of document.querySelectorAll('.opt[data-rec="1"]')) {
+  let tags = recBtn.querySelector('.opt-tags');
+  if (!tags) {
+    tags = document.createElement('span');
+    tags.className = 'opt-tags';
+    recBtn.prepend(tags);
+  }
+  if (!tags.querySelector('.tag-rec')) {
+    const tag = document.createElement('span');
+    tag.className = 'opt-tag tag-rec';
+    tag.textContent = LANG.tagRec;
+    tags.appendChild(tag);
+  }
+}
 
 // Lazy mermaid render — collapsed cards have 0 width so mermaid renders at micro-scale.
 // Render each card's diagrams the first time it opens.
@@ -1666,12 +1703,12 @@ const hideWarn = () => warnRow.dataset.show = '0';
 const updateOutput = () => {
   const total = cards.length;
   const answered = Object.values(answers).filter(a => a && (a.value || a.custom)).length;
-  progress.textContent = answered === total ? `✓ 完成` : `${answered} / ${total}`;
+  progress.textContent = answered === total ? LANG.progressDone : `${answered} / ${total}`;
   progressFill.style.setProperty('width', total > 0 ? `${(answered / total) * 100}%` : '0%', 'important');
   document.body.dataset.allDone = answered === total ? '1' : '0';
 
-  // Markdown output — 全中文
-  const lines = [`## Grill 回答 · 第 ${ROUND} 轮 · ${TOPIC}`, ''];
+  // Markdown output
+  const lines = [LANG.mdHeading(ROUND, TOPIC), ''];
   for (const card of cards) {
     const id = card.dataset.id;
     const q = card.querySelector('.card-header .title-text')?.textContent.trim() || id;
@@ -1679,18 +1716,17 @@ const updateOutput = () => {
     lines.push(`**${q}**`);
     if (a) {
       if (a.custom) {
-        lines.push(`- 自填: ${a.custom}`);
+        lines.push(LANG.mdCustom(a.custom));
       } else {
-        const tag = a.recommended ? '（推荐）' : '';
-        lines.push(`- 选择: \`${a.value}\` — ${a.label}${tag}`);
+        lines.push(LANG.mdChoice(a.value, a.label, a.recommended));
       }
     } else {
-      lines.push(`- _(未回答)_`);
+      lines.push(LANG.mdUnanswered);
     }
     lines.push('');
   }
   // Don't clobber manual edits — once user types in the textarea,
-  // they own its contents until they hit 重置.
+  // they own its contents until they hit Reset.
   if (mdOut.dataset.dirty !== '1') {
     mdOut.value = lines.join('\n');
   }
@@ -1845,22 +1881,22 @@ const doCopy = async () => {
     ok = fallbackCopy(text);
   }
   if (!ok) {
-    copyBtn.textContent = '失败 · 请手动 ⌘C';
+    copyBtn.textContent = LANG.copyFailed;
     copyBtn.dataset.failed = '1';
-    setTimeout(() => { copyBtn.textContent = '复制'; delete copyBtn.dataset.failed; }, 3500);
+    setTimeout(() => { copyBtn.textContent = LANG.copyDefault; delete copyBtn.dataset.failed; }, 3500);
     return;
   }
-  copyBtn.textContent = '已复制';
+  copyBtn.textContent = LANG.copyCopied;
   copyBtn.dataset.copied = '1';
   if (doneCopyBtn) {
-    doneCopyBtn.textContent = '✓ 已复制 — 现在去粘回对话框';
+    doneCopyBtn.textContent = LANG.doneCtaCopied;
     doneCopyBtn.dataset.copied = '1';
   }
   setTimeout(() => {
-    copyBtn.textContent = '复制';
+    copyBtn.textContent = LANG.copyDefault;
     delete copyBtn.dataset.copied;
     if (doneCopyBtn) {
-      doneCopyBtn.textContent = '复制答案 →';
+      doneCopyBtn.textContent = LANG.doneCtaDefault;
       delete doneCopyBtn.dataset.copied;
     }
   }, 3000);
@@ -1871,10 +1907,10 @@ copyBtn.addEventListener('click', (e) => {
   e.stopPropagation();
   const missing = unansweredCards();
   if (missing.length === 0) { doCopy(); return; }
-  const labels = missing.map(c => c.querySelector('.qnum').textContent.replace('.', '')).join('、');
+  const labels = missing.map(c => c.querySelector('.qnum').textContent.replace('.', '')).join(LANG.warnJoin);
   warnMsg.replaceChildren(
     Object.assign(document.createElement('b'), { textContent: labels }),
-    document.createTextNode(' 还没回答，仍要复制吗？'),
+    document.createTextNode(LANG.warnSuffix),
   );
   warnRow.dataset.show = '1';
 });

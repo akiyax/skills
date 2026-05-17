@@ -1,6 +1,6 @@
 ---
 name: grill-me-visual
-description: Generate a single-file HTML questionnaire with visual previews (UI mockups, CSS animations, Mermaid diagrams, font samples, content rendering rules) when the user needs to make multiple visually-shaped decisions — layout, motion, typography, diagram shape, content rendering rules, etc. Fire PROACTIVELY whenever you're about to ask the user 3+ choices in chat that have visual trade-offs they really need to *see* to decide well — don't wait for them to ask. 
+description: Generate a single-file HTML questionnaire with visual previews (UI mockups, CSS animations, Mermaid diagrams, font samples, content rendering rules) when the user needs to make multiple visually-shaped decisions — layout, motion, typography, diagram shape, content rendering rules, etc. Fire PROACTIVELY whenever you're about to ask the user 3+ visual-trade-off choices in chat, OR 2 choices where seeing options side-by-side would meaningfully change the answer — don't wait for them to ask.
 ---
 
 # grill-me-visual
@@ -10,10 +10,6 @@ Emits a **single-file HTML questionnaire** the user opens in a browser. Each que
 ## Scope
 
 Use this skill only when the decision space is visually-shaped — UI layout, motion, typography, color, diagram shape, or content rendering rules (how code / markdown / icons / math / tables get displayed). If the decisions are text only with no visual angle, ask them in plain chat instead — the HTML overhead isn't worth it.
-
-## Before invoking
-
-If you're mid-conversation and notice you're about to ask the user a series of visual choices — pause and invoke this skill instead of asking in chat. Threshold: 3+ visual decisions in the immediate next turn, or 2 decisions where seeing the options side-by-side would meaningfully change the answer.
 
 ---
 
@@ -28,7 +24,7 @@ Two templates ship with this skill — pick by user language:
 
 Both templates share identical CSS / JS / accordion / clipboard / Mermaid wiring — only the textual content differs. Mixing languages within one file works but reads poorly; pick one and stick to it for the round.
 
-For other languages, copy the closest fit (probably `template.en.html`) and translate the chrome strings — see "Chrome strings reference" below.
+For other languages, copy the closest fit (probably `template.en.html`) and translate the chrome strings — see "Translating to a third language" below.
 
 ---
 
@@ -48,7 +44,7 @@ For other languages, copy the closest fit (probably `template.en.html`) and tran
 
 ## Authoring flow — how to fill the template
 
-The template is a single HTML file (~1900 lines, ~30k tokens — **larger than the default Read window**). Don't slurp the whole file. Use these patterns:
+The template is a single HTML file (~1900 lines, ~75 KB, roughly 20–25k tokens — **larger than the default Read window**). Don't slurp the whole file. Use these patterns:
 
 - `Bash grep -n "Qn START"` to locate a card's line number, then `Read` with `offset` + `limit` (~80 lines per card)
 - The `<!-- Qn START · PATTERN: ... -->` comment header tells you what preview pattern each demo card uses — match yours to one of them
@@ -62,7 +58,8 @@ The template is a single HTML file (~1900 lines, ~30k tokens — **larger than t
           # path the harness gave you when loading the skill.
           # <output-path> = either a project-local path like
           # "grill-{topic-slug}-round-{N}.html" (preferred for multi-round, ask before committing)
-          # or $(mktemp -t grill-XXXXXX.html) for one-shot throwaway use.
+          # or "/tmp/grill-$(date +%s).html" for one-shot throwaway use.
+          # (Avoid `mktemp -t ...` — its semantics differ between macOS and Linux.)
 2. Edit:  replace `const TOPIC = "..."` with this round's topic
 3. Edit:  replace `const ROUND = ...` if this is round N > 1
 4. Edit:  replace masthead `<span class="topic">...</span>` text to match TOPIC
@@ -71,21 +68,22 @@ The template is a single HTML file (~1900 lines, ~30k tokens — **larger than t
           `<!-- ─────────── Qn START · PATTERN: ... ───────────` and
           `<!-- ─────────── Qn END ─────────── -->` markers.
           Card IDs go q1, q2, … qN; the markdown output groups answers by this id.
-7. Smoke-test in a browser BEFORE handing to the user.  `open <path>`,
-          click through every option in every card, hit Copy, sanity-check
-          the markdown output. Common breakage to catch:
-          - Mermaid render failure (syntax violates the hard constraints below)
-          - data-id mismatch (card numbering vs `qN` slug)
-          - Missing data-rec="1" on the recommended option
-          - Fonts silently falling back to system (font not loaded in <head>)
-8. Hand off.  Give the user the absolute path. On macOS, `open <path>` opens
-          their default browser directly. For phone/tablet review, serve via
-          your project's dev server on LAN.
+7. Static sanity check BEFORE handing off — you cannot open a browser, so grep
+          the file for these foot-guns instead:
+          - `grep -c 'data-id="q' <file>` matches your intended card count (and IDs are q1…qN sequential)
+          - `grep -c '<button[^>]*data-rec="1"' <file>` == card count — every question has exactly one recommended option
+          - For Mermaid cards, eyeball each `<pre class="mermaid">` block against the hard constraints (no `:`, no `"`, no `<`/`>`, basic shapes only)
+          - For font questions, every `font-family` you reference is loaded via the Google Fonts <link> in <head>
+          - `data-value="..."` slugs are unique within each card
+8. Hand off.  Give the user the absolute path and ask them to open it in a browser
+          to verify rendering. On macOS that's `open <path>`; for phone/tablet
+          review serve via your project's dev server on LAN. If they spot a
+          Mermaid render failure / font fallback / layout issue, fix and re-hand.
 ```
 
 **Do not touch:**
-- `<head>` (CSS, Google Fonts, viewport meta, theme-color, copy fallback are pre-wired)
-- The `<script>` block at the bottom (Mermaid init, accordion logic, copy/reset, dirty-flag tracking, mobile-safe clipboard fallback)
+- `<head>` (CSS, Google Fonts, viewport meta, theme-color, copy fallback are pre-wired). Exception: when translating, swap CDN URLs if needed.
+- The `<script>` block at the bottom (Mermaid init, accordion logic, copy/reset, dirty-flag tracking, mobile-safe clipboard fallback, tag-rec auto-inject). Exception: when translating, edit the `LANG = { ... }` object at the top of `<script>` and nothing else — see "Translating to a third language" below.
 - Styles for `.card` / `.opt` / `.opt-tags` / `.chevron` / scrollbars / dark mode
 - Theme variables (`--paper`, `--ink`, `--clay`, `--moss`, etc.)
 
@@ -104,7 +102,7 @@ Each card replaces the block between `<!-- Qn START -->` and `<!-- Qn END -->`. 
 - 3 `<button class="opt opt-rich" data-value="slug" [data-rec="1"] data-label="A. …">` options with `.opt-preview` + `.pros-cons` + `.opt-label`
 - 1 `<div class="opt opt-input">` for free-text "Other…" (always last)
 
-Tags inside `<span class="opt-tags">…</span>`: any combination of `<span class="opt-tag tag-rec">Recommended</span>` and `<span class="opt-tag tag-current">Current</span>`.
+Tags: set `<span class="opt-tags"><span class="opt-tag tag-current">Current</span></span>` on the option the user is using today (if any). The `Recommended` tag is auto-injected from `data-rec="1"` — don't add it by hand. To translate the recommended label, edit `LANG.tagRec` only.
 
 ---
 
@@ -176,37 +174,21 @@ For genuinely open-ended questions where some options have "no UI" (e.g. silent 
 1. **q-desc structure: setting → impact.** Explain when the decision applies and what it affects. Do **not** preview the options inside q-desc.
 2. **rec-hint is the cross-option comparison**, one sentence framing why the recommended option wins *over the alternatives*. `<b>{option name}</b> — {reason it beats the other choices}`. Don't just restate the recommended option's pros — those go in its `pros-cons` list. rec-hint answers "why this one and not the others"; pros-cons answers "what are the trade-offs of this specific option in isolation".
 3. **Every preset option needs `<ul class="pros-cons">`** with 2–3 `<li class="pro">` and 1–2 `<li class="con">`. Pros first, then cons. Exception: pure-affordance options like "None" in nullable questions.
-4. **All-or-none preview** — within one question, either every preset option has a `.opt-preview` mockup, or none does.
-5. **Recommended option gets `data-rec="1"` + `<span class="opt-tag tag-rec">{Recommended}</span>`** inside `.opt-tags`. The `data-rec="1"` attribute is what triggers the `(recommended)` suffix in the markdown output — dropping it silently degrades the answer summary. Translate the tag label to match the template language.
-6. **Tags are your call** — agent decides per option whether to mark it `tag-rec`, `tag-current` (user is doing this currently), both, or neither. The visual system supports any combination.
+4. **All-or-none preview** — within one question, either every preset option has a `.opt-preview` mockup, or none does. Pattern #6 (text-only) is the all-none case: every option's `.opt-preview` holds only pros/cons, no mockup. Don't mix mocked options with plain `.opt` (no `opt-rich`) options in the same question.
+5. **Recommended option gets `data-rec="1"`** — that single attribute drives both the `(recommended)` suffix in the markdown output *and* the auto-injected `Recommended` tag in the UI. Don't write the tag span by hand.
+6. **`tag-current` is manual, `tag-rec` is automatic.** Add `<span class="opt-tag tag-current">Current</span>` inside `<span class="opt-tags">…</span>` when the user is doing this thing today. The recommended tag appears automatically wherever `data-rec="1"` is set — see rule 5.
 7. **D-option placeholder must be context-specific** — e.g. "Other container style…" not generic "Other…".
 8. **Lede uses agent's roadmap POV** — frame it as the agent's spine of decisions ("From X to Y to Z — these N decisions define …"), not as instructions to the user ("Answer these N questions about …").
 
 ---
 
-## Chrome strings reference (only when translating to a new language)
+## Translating to a third language
 
-Both shipped templates have these strings already translated. If you adapt to a third language, replace these:
+The two shipped templates are kept structurally identical — their `<script>` bodies are byte-identical after the `LANG` object — and differ in exactly three places:
 
-| Slot | English | Chinese (Simplified) |
-|---|---|---|
-| Eyebrow | `Grill · Round N` | `Grill · 第 N 轮` |
-| Output panel title | `Answers` | `回答汇总` |
-| Copy button | `Copy` | `复制` |
-| Copied state | `Copied` | `已复制` |
-| Copy failed | `Failed · press ⌘C manually` | `失败 · 请手动 ⌘C` |
-| Reset button | `Reset` | `重置` |
-| Done banner title | `All decided — bring answers back to chat` | `决策完毕 — 把答案带回对话` |
-| Done banner CTA | `Copy answers →` | `复制答案 →` |
-| Done banner copied state | `✓ Copied — paste it into the chat now` | `✓ 已复制 — 现在去粘回对话框` |
-| `tag-rec` label | `Recommended` | `推荐` |
-| `tag-current` label | `Current` | `当前` |
-| Warn row goto | `Go fill in` | `去补答` |
-| Warn row force | `Copy anyway` | `仍然复制` |
-| Markdown heading | `## Grill answers · Round N · {TOPIC}` | `## Grill 回答 · 第 N 轮 · {TOPIC}` |
-| Markdown custom | `- Custom: {value}` | `- 自填: {value}` |
-| Markdown choice | `- Choice: \`{value}\` — {label}` | `- 选择: \`{value}\` — {label}` |
-| Markdown unanswered | `- _(unanswered)_` | `- _(未回答)_` |
-| Markdown recommended suffix | ` (recommended)` | `（推荐）` |
-| Unanswered warning | `{labels} not answered yet. Copy anyway?` | `{labels} 还没回答，仍要复制吗？` |
+1. **The `LANG = { ... }` object** at the top of `<script>` — all strings that JS emits dynamically (markdown output, button states, warning text, the `Recommended` tag label).
+2. **Inline HTML chrome strings** — masthead eyebrow / topic, lede, output-panel title, button labels (Copy / Reset / warn-row goto+force), done-banner title + CTA, the `tag-current` label, every demo card's body.
+3. **`<head>` CDN URLs** — Google Fonts and Mermaid. Use China-accessible mirrors (`fonts.googleapis.cn`, `cdn.bootcdn.net`) when the audience is in China.
+
+To add a new language: copy whichever template is closest, swap (1)+(2)+(3), and `diff` the JS body against the original to confirm nothing else drifted. Run `diff <(awk '/^const dark = matchMedia/,/^<\/script>/' template.en.html) <(awk '/^const dark = matchMedia/,/^<\/script>/' template.NEW.html)` — it must be empty.
 

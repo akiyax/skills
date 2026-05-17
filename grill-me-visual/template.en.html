@@ -152,7 +152,7 @@
     background: var(--clay-tint);
     border: 1px solid var(--clay);
     border-radius: 10px;
-    margin-bottom: 2.5rem;
+    margin: 1.5rem 0 1.25rem;
     box-shadow: 0 4px 24px rgba(201,100,66,.12);
     animation: doneAppear .55s cubic-bezier(.2,.8,.2,1) both;
   }
@@ -744,6 +744,12 @@
     padding: 0 0 .55rem;
     user-select: none;
   }
+  .panel-actions {
+    margin-left: auto;
+    display: flex;
+    gap: .65rem;
+    align-items: center;
+  }
 
   /* Sticky summary bar — title bar + progress + Reset/Copy, always visible */
   .summary-bar {
@@ -946,16 +952,14 @@
 
   .warn-row {
     display: none;
-    position: fixed;
-    left: 0; right: 0;
-    bottom: calc(2.85rem + env(safe-area-inset-bottom, 0px));
-    z-index: 51;
     align-items: center;
-    gap: 1rem;
-    padding: .85rem clamp(1rem, 4vw, 2.25rem);
+    flex-wrap: wrap;
+    gap: .65rem 1rem;
+    padding: .65rem .85rem;
+    margin: 0 0 .6rem;
     background: var(--paper-deep);
-    border-top: 1px solid var(--clay);
-    border-bottom: 1px solid var(--pencil);
+    border: 1px solid var(--clay);
+    border-radius: 4px;
     font-family: var(--serif);
     font-size: .95rem;
     color: var(--ink);
@@ -1069,7 +1073,7 @@
           <div class="options">
 
             <button type="button" class="opt opt-rich" data-value="document" data-rec="1" data-label="A. Document style">
-              <span class="opt-tags"><span class="opt-tag tag-current">Current</span><span class="opt-tag tag-rec">Recommended</span></span>
+              <span class="opt-tags"><span class="opt-tag tag-current">Current</span></span>
               <div class="opt-preview" style="font-style:normal;">
                 <div class="mockup-frame" style="padding:.85rem .9rem;">
                   <div style="font-size:.62rem; color:var(--ink-faded); text-transform:uppercase; letter-spacing:.1em; margin-bottom:.4rem;">Assistant</div>
@@ -1163,7 +1167,6 @@
           <div class="options">
 
             <button type="button" class="opt opt-rich" data-value="cursor" data-rec="1" data-label="A. Blinking cursor">
-              <span class="opt-tags"><span class="opt-tag tag-rec">Recommended</span></span>
               <div class="opt-preview" style="font-style:normal;">
                 <div class="mockup-frame" style="padding:1rem 1.1rem; display:flex; align-items:center; gap:.2rem; min-height:3.2rem;">
                   <span style="font-family:var(--sans); font-size:.92rem; color:var(--ink);">Let me think about that</span>
@@ -1270,7 +1273,6 @@ flowchart TD
             </button>
 
             <button type="button" class="opt opt-rich" data-value="auto-retry" data-rec="1" data-label="B. Auto exponential backoff (recommended)">
-              <span class="opt-tags"><span class="opt-tag tag-rec">Recommended</span></span>
               <div class="opt-preview">
 <pre class="mermaid">
 flowchart TD
@@ -1344,7 +1346,6 @@ flowchart TD
           <div class="options">
 
             <button type="button" class="opt opt-rich" data-value="source-serif" data-rec="1" data-label="A. Source Serif 4 (editorial warmth)">
-              <span class="opt-tags"><span class="opt-tag tag-rec">Recommended</span></span>
               <div class="opt-preview">
                 <div class="mockup-frame" style="padding:1.4rem 1rem; text-align:center; font-style:normal;">
                   <div style="font-family:'Source Serif 4', Georgia, serif; font-size:2.9rem; font-weight:600; color:var(--ink); line-height:1; letter-spacing:-.005em;">Aurora</div>
@@ -1424,7 +1425,6 @@ flowchart TD
           <div class="options">
 
             <button type="button" class="opt opt-rich" data-value="flat-array" data-rec="1" data-label="A. Flat role/content array">
-              <span class="opt-tags"><span class="opt-tag tag-rec">Recommended</span></span>
               <div class="opt-preview">
                 <div class="code-snippet">
                   <div class="code-head"><span class="code-lang">typescript</span></div>
@@ -1519,7 +1519,6 @@ flowchart TD
           <div class="options">
 
             <button type="button" class="opt opt-rich" data-value="silent" data-rec="1" data-label="A. Silent wait">
-              <span class="opt-tags"><span class="opt-tag tag-rec">Recommended</span></span>
               <div class="opt-preview" style="font-style:normal;">
                 <ul class="pros-cons">
                   <li class="pro">Minimal, zero interruption; user controls the opening</li>
@@ -1581,16 +1580,19 @@ flowchart TD
   <section class="output" id="output">
     <div class="panel-head">
       <h3>Answers</h3>
+      <div class="panel-actions">
+        <button type="button" class="reset-link" id="reset-md-btn" title="Discard manual edits and regenerate from option choices">Reset</button>
+        <button type="button" class="copy-link" id="copy-btn">Copy</button>
+      </div>
+    </div>
+    <div class="warn-row" id="warn-row">
+      <span class="msg" id="warn-msg"></span>
+      <button type="button" class="ghost" id="warn-goto">Go fill in</button>
+      <button type="button" class="ghost" id="warn-force">Copy anyway</button>
     </div>
     <div class="body"><textarea id="md-out" spellcheck="false" rows="1"></textarea></div>
   </section>
 </main>
-
-<div class="warn-row" id="warn-row">
-  <span class="msg" id="warn-msg"></span>
-  <button type="button" class="ghost" id="warn-goto">Go fill in</button>
-  <button type="button" class="ghost" id="warn-force">Copy anyway</button>
-</div>
 
 <div class="summary-bar" id="summary-bar">
   <div class="progress-track" aria-hidden="true">
@@ -1598,15 +1600,32 @@ flowchart TD
   </div>
   <div class="summary-row">
     <span class="summary-label" id="progress">0 / 6</span>
-    <button type="button" class="reset-link" id="reset-md-btn" title="Discard manual edits and regenerate from option choices">Reset</button>
-    <button type="button" class="copy-link" id="copy-btn">Copy</button>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.4/dist/mermaid.min.js"></script>
 <script>
 const TOPIC = "AI chat interface";
 const ROUND = 1;
+
+// All user-facing strings. The only thing that differs between language templates
+// is this LANG object + the <head> CDN URLs (Google Fonts + Mermaid). The rest of
+// this <script> must stay byte-identical across language templates.
+const LANG = {
+  progressDone:   '✓ Done',
+  mdHeading:      (round, topic) => `## Grill answers · Round ${round} · ${topic}`,
+  mdCustom:       (val) => `- Custom: ${val}`,
+  mdChoice:       (val, label, rec) => `- Choice: \`${val}\` — ${label}${rec ? ' (recommended)' : ''}`,
+  mdUnanswered:   '- _(unanswered)_',
+  copyDefault:    'Copy',
+  copyCopied:     'Copied',
+  copyFailed:     'Failed · press ⌘C manually',
+  doneCtaDefault: 'Copy answers →',
+  doneCtaCopied:  '✓ Copied — paste it into the chat now',
+  warnSuffix:     ' not answered yet. Copy anyway?',
+  warnJoin:       ', ',
+  tagRec:         'Recommended',
+};
 
 const dark = matchMedia('(prefers-color-scheme: dark)').matches;
 mermaid.initialize({
@@ -1631,6 +1650,24 @@ mermaid.initialize({
 });
 
 const cards = [...document.querySelectorAll('#questions .card')];
+
+// Auto-inject the "Recommended" tag whenever data-rec="1" is set, so each card
+// only needs one source of truth for the recommendation. Idempotent — skips
+// when a .tag-rec span already exists.
+for (const recBtn of document.querySelectorAll('.opt[data-rec="1"]')) {
+  let tags = recBtn.querySelector('.opt-tags');
+  if (!tags) {
+    tags = document.createElement('span');
+    tags.className = 'opt-tags';
+    recBtn.prepend(tags);
+  }
+  if (!tags.querySelector('.tag-rec')) {
+    const tag = document.createElement('span');
+    tag.className = 'opt-tag tag-rec';
+    tag.textContent = LANG.tagRec;
+    tags.appendChild(tag);
+  }
+}
 
 // Lazy mermaid render — collapsed cards have 0 width so mermaid renders at micro-scale.
 // Render each card's diagrams the first time it opens.
@@ -1663,12 +1700,12 @@ const hideWarn = () => warnRow.dataset.show = '0';
 const updateOutput = () => {
   const total = cards.length;
   const answered = Object.values(answers).filter(a => a && (a.value || a.custom)).length;
-  progress.textContent = answered === total ? `✓ Done` : `${answered} / ${total}`;
+  progress.textContent = answered === total ? LANG.progressDone : `${answered} / ${total}`;
   progressFill.style.setProperty('width', total > 0 ? `${(answered / total) * 100}%` : '0%', 'important');
   document.body.dataset.allDone = answered === total ? '1' : '0';
 
   // Markdown output
-  const lines = [`## Grill answers · Round ${ROUND} · ${TOPIC}`, ''];
+  const lines = [LANG.mdHeading(ROUND, TOPIC), ''];
   for (const card of cards) {
     const id = card.dataset.id;
     const q = card.querySelector('.card-header .title-text')?.textContent.trim() || id;
@@ -1676,13 +1713,12 @@ const updateOutput = () => {
     lines.push(`**${q}**`);
     if (a) {
       if (a.custom) {
-        lines.push(`- Custom: ${a.custom}`);
+        lines.push(LANG.mdCustom(a.custom));
       } else {
-        const tag = a.recommended ? ' (recommended)' : '';
-        lines.push(`- Choice: \`${a.value}\` — ${a.label}${tag}`);
+        lines.push(LANG.mdChoice(a.value, a.label, a.recommended));
       }
     } else {
-      lines.push(`- _(unanswered)_`);
+      lines.push(LANG.mdUnanswered);
     }
     lines.push('');
   }
@@ -1842,22 +1878,22 @@ const doCopy = async () => {
     ok = fallbackCopy(text);
   }
   if (!ok) {
-    copyBtn.textContent = 'Failed · press ⌘C manually';
+    copyBtn.textContent = LANG.copyFailed;
     copyBtn.dataset.failed = '1';
-    setTimeout(() => { copyBtn.textContent = 'Copy'; delete copyBtn.dataset.failed; }, 3500);
+    setTimeout(() => { copyBtn.textContent = LANG.copyDefault; delete copyBtn.dataset.failed; }, 3500);
     return;
   }
-  copyBtn.textContent = 'Copied';
+  copyBtn.textContent = LANG.copyCopied;
   copyBtn.dataset.copied = '1';
   if (doneCopyBtn) {
-    doneCopyBtn.textContent = '✓ Copied — paste it into the chat now';
+    doneCopyBtn.textContent = LANG.doneCtaCopied;
     doneCopyBtn.dataset.copied = '1';
   }
   setTimeout(() => {
-    copyBtn.textContent = 'Copy';
+    copyBtn.textContent = LANG.copyDefault;
     delete copyBtn.dataset.copied;
     if (doneCopyBtn) {
-      doneCopyBtn.textContent = 'Copy answers →';
+      doneCopyBtn.textContent = LANG.doneCtaDefault;
       delete doneCopyBtn.dataset.copied;
     }
   }, 3000);
@@ -1868,10 +1904,10 @@ copyBtn.addEventListener('click', (e) => {
   e.stopPropagation();
   const missing = unansweredCards();
   if (missing.length === 0) { doCopy(); return; }
-  const labels = missing.map(c => c.querySelector('.qnum').textContent.replace('.', '')).join(', ');
+  const labels = missing.map(c => c.querySelector('.qnum').textContent.replace('.', '')).join(LANG.warnJoin);
   warnMsg.replaceChildren(
     Object.assign(document.createElement('b'), { textContent: labels }),
-    document.createTextNode(' not answered yet. Copy anyway?'),
+    document.createTextNode(LANG.warnSuffix),
   );
   warnRow.dataset.show = '1';
 });
