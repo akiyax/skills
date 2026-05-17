@@ -54,13 +54,17 @@ The template is a single HTML file (~1900 lines, ~75 KB, roughly 20–25k tokens
 **Do not rewrite the template** — copy it and edit only the question content.
 
 ```
-1. Bash:  cp <skill-dir>/template.<en|zh>.html <output-path>
+1. Bash:  mkdir -p .claude/grill-me-visual && cp <skill-dir>/template.<en|zh>.html <output-path>
           # <skill-dir> = the directory this SKILL.md lives in. Resolve from the
           # path the harness gave you when loading the skill.
-          # <output-path> = either a project-local path like
-          # "grill-{topic-slug}-round-{N}.html" (preferred for multi-round, ask before committing)
-          # or "/tmp/grill-$(date +%s).html" for one-shot throwaway use.
-          # (Avoid `mktemp -t ...` — its semantics differ between macOS and Linux.)
+          # <output-path> = .claude/grill-me-visual/grill-{topic-slug}-round-{N}.html
+          # — project-local under the .claude/ convention. Decisions belong to
+          # the project they're about; multi-round files cluster together; the
+          # user can commit them or gitignore them at their own discretion.
+          # Use a relative path with forward slashes so it works cross-platform
+          # (macOS, Linux, WSL, Git Bash, PowerShell, cmd). Avoid `/tmp`
+          # (missing on native Windows) and `mktemp -t ...` (semantics differ
+          # between macOS and Linux).
 2. Edit:  replace `const TOPIC = "..."` with this round's topic
 3. Edit:  replace `const ROUND = ...` if this is round N > 1
 4. Edit:  replace masthead `<span class="topic">...</span>` text to match TOPIC
