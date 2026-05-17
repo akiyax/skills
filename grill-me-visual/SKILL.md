@@ -35,9 +35,10 @@ For other languages, copy the closest fit (probably `template.en.html`) and tran
 3. **Pick a preview pattern per question** (see pattern catalog below). See Content rules for the all-or-none rule.
 4. **Create + smoke-test the HTML file** by copying the right template (see authoring flow below).
 5. **Hand the file path to the user** and wait for their answers.
-6. **When they paste the markdown summary back**, parse the answers. Decide whether to:
-   - Run another round (new questions informed by these answers)
-   - Move on to building based on the decisions
+6. **When they paste the markdown summary back**, parse the answers. Drill until every visually-shaped decision is resolved — don't stop at one round just because the user answered everything:
+   - If any answer reveals a new unresolved dependency (e.g. "Card layout" chosen → now spacing rhythm and border style matter), run another round targeting that branch
+   - If answers conflict or raise new trade-offs, surface them in the next round before building
+   - Only move on to building when no open visual decision remains
 7. **End of session: ask the user about decision capture** — recommend ADR / CONTEXT.md / PRD if any decisions deserve long-term storage. **Do not auto-write** the doc; let the user decide.
 
 ---
