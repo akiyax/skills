@@ -1,0 +1,1903 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#F5F1EA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#100F0B" media="(prefers-color-scheme: dark)">
+<title>Grill · AI chat 对话界面</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.cn">
+<link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin>
+<link href="https://fonts.googleapis.cn/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,500;1,8..60,600&family=Manrope:wght@400;500;600&family=Playfair+Display:wght@400;600;700;900&family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..700,0..100,0..1&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --paper:        #F5F1EA;
+    --paper-light:  #FAF8F2;
+    --paper-deep:   #ECE6D8;
+    --ink:          #1A1916;
+    --ink-medium:   #5B5650;
+    --ink-faded:    #8B857B;
+    --pencil:       #D9D3C5;
+    --pencil-soft:  #E4DECF;
+    --clay:         #C96442;
+    --clay-deep:    #A8512F;
+    --clay-tint:    #F5E6DA;
+    --moss:         #4A7A44;
+    --rust:         #9D4A3D;
+    /* For Chinese glyphs: serif chain prefers Chinese serif fonts. */
+    --serif: "Source Serif 4", "Charter", "Iowan Old Style", Georgia,
+             "Songti SC", "STSong", "SimSun", "宋体", "Noto Serif SC",
+             "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+             serif;
+    --sans:  ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+             "Helvetica Neue", Arial,
+             "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+             "Noto Sans SC", sans-serif;
+    --mono:  ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper:       #100F0B;
+      --paper-light: #24221C;
+      --paper-deep:  #08070A;
+      --ink:         #FAF4E2;
+      --ink-medium:  #DBD4C2;
+      --ink-faded:   #A8A192;
+      --pencil:      #585347;
+      --pencil-soft: #3F3D34;
+      --clay:        #D97757;
+      --clay-deep:   #C96442;
+      --clay-tint:   #3D2C24;
+      --moss:        #8AAA82;
+      --rust:        #D08C7A;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    overflow-x: hidden;
+    overscroll-behavior-x: contain;
+    touch-action: pan-y;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  input, textarea { font-size: 16px; }
+  body {
+    font-family: var(--serif);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink);
+    background: var(--paper);
+    background-image:
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0 0.06 0 0 0 0.03 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    background-attachment: fixed;
+    min-height: 100vh;
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));  /* clear .summary-bar */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    text-wrap: pretty;
+  }
+  @media (prefers-color-scheme: dark) {
+    body {
+      background-image:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.05 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    }
+  }
+  /* (panel-open class no longer used — panel is inline) */
+
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 5rem;
+  }
+
+  /* Compact masthead — topic lives inline with eyebrow */
+  .masthead {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: .55em;
+    font-family: var(--sans);
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--clay);
+  }
+  .eyebrow .dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--clay);
+  }
+  .topic {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 1.1rem;
+    line-height: 1.3;
+    color: var(--ink);
+    letter-spacing: -.005em;
+  }
+  .topic::before {
+    content: "·";
+    color: var(--ink-faded);
+    margin: 0 .55rem 0 0;
+    font-style: normal;
+  }
+  .lede {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: .93rem;
+    line-height: 1.5;
+    color: var(--ink-medium);
+    max-width: 52ch;
+    margin: 0 0 1.75rem;
+  }
+
+  /* Done call-to-action card — appears when all questions answered */
+  .done-banner {
+    display: none;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem 1.75rem;
+    background: var(--clay-tint);
+    border: 1px solid var(--clay);
+    border-radius: 10px;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 4px 24px rgba(201,100,66,.12);
+    animation: doneAppear .55s cubic-bezier(.2,.8,.2,1) both;
+  }
+  body[data-all-done="1"] .done-banner { display: flex; }
+  @keyframes doneAppear {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .done-banner .ornament {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1.85rem;
+    color: var(--clay);
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .done-banner .msg { flex: 1; min-width: 0; }
+  .done-banner .msg strong {
+    display: block;
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 1.2rem;
+    letter-spacing: -.005em;
+    color: var(--ink);
+    margin-bottom: .2rem;
+  }
+  .done-banner .msg span {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: .95rem;
+    color: var(--ink-medium);
+    display: block;
+  }
+  .done-banner .done-cta {
+    flex-shrink: 0;
+    background: var(--clay);
+    color: var(--paper-light);
+    border: 0;
+    border-radius: 6px;
+    padding: .85rem 1.4rem;
+    font-family: var(--sans);
+    font-size: .98rem;
+    font-weight: 500;
+    letter-spacing: .005em;
+    cursor: pointer;
+    transition: background .18s ease, transform .12s ease, box-shadow .25s ease;
+    box-shadow: 0 2px 0 var(--clay-deep);
+    animation: pulseCta 1.6s ease-in-out 3;
+  }
+  .done-banner .done-cta:hover {
+    background: var(--clay-deep);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 0 var(--clay-deep), 0 6px 14px rgba(201,100,66,.25);
+  }
+  .done-banner .done-cta:active { transform: translateY(0); box-shadow: 0 1px 0 var(--clay-deep); }
+  .done-banner .done-cta[data-copied="1"] {
+    background: var(--moss);
+    box-shadow: 0 2px 0 #355C32;
+    pointer-events: none;
+    animation: none;
+  }
+  @keyframes pulseCta {
+    0%, 100% { box-shadow: 0 2px 0 var(--clay-deep), 0 0 0 0 rgba(201,100,66,.45); }
+    50%      { box-shadow: 0 2px 0 var(--clay-deep), 0 0 0 12px rgba(201,100,66,0); }
+  }
+  @media (max-width: 600px) {
+    .done-banner { flex-direction: column; align-items: stretch; gap: 1rem; padding: 1.25rem; }
+    .done-banner .done-cta { width: 100%; }
+  }
+
+  /* Question section */
+  .card {
+    border-top: 1px solid var(--pencil);
+    padding: 1.65rem 0 0;
+    transition: padding .25s ease;
+  }
+  .card:first-of-type { border-top: 0; padding-top: .5rem; }
+  .card:first-of-type[data-open="1"] { padding-top: .75rem; }
+  .card:last-of-type { border-bottom: 1px solid var(--pencil); padding-bottom: .35rem; }
+  .card[data-open="1"] { padding: 2.2rem 0 .25rem; }
+  .card[data-open="1"]:last-of-type { padding-bottom: .5rem; }
+
+  .card-header {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 3rem 1fr auto;
+    align-items: baseline;
+    gap: 1.25rem;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    padding: 0 0 1rem;
+    scroll-margin-top: 32px;
+  }
+  .card-header:hover .title-text { color: var(--clay-deep); }
+
+  .qnum {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.55rem;
+    color: var(--ink-faded);
+    line-height: 1;
+    align-self: flex-start;
+    padding-top: .12em;
+    transition: color .25s ease;
+  }
+  .card[data-answered="1"]:not([data-open="1"]) .qnum { color: var(--clay); }
+  .card[data-open="1"] .qnum { color: var(--ink); }
+
+  .title-group { display: flex; flex-direction: column; gap: .25rem; }
+
+  .title-text {
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 1.32rem;
+    line-height: 1.35;
+    letter-spacing: -.008em;
+    color: var(--ink);
+    transition: color .25s ease;
+  }
+  .card[data-answered="1"]:not([data-open="1"]) .title-text {
+    color: var(--ink-medium);
+    font-weight: 400;
+  }
+  .selected-label {
+    display: none;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: .95rem;
+    color: var(--ink-medium);
+  }
+  .card[data-answered="1"]:not([data-open="1"]) .selected-label { display: block; }
+  .selected-label::before {
+    content: "→  ";
+    color: var(--clay);
+    font-style: normal;
+  }
+
+  .chevron {
+    font-family: var(--sans);
+    font-size: 1.05rem;
+    font-weight: 300;
+    color: var(--ink-faded);
+    line-height: 1;
+    padding-top: .35rem;
+    transition: color .25s ease;
+    display: inline-block;
+    width: 1rem;
+    text-align: center;
+  }
+  .chevron::before { content: '+'; }
+  .card[data-open="1"] .chevron {
+    color: var(--clay);
+  }
+  .card[data-open="1"] .chevron::before { content: '−'; }
+
+  .card-body {
+    display: none;
+    padding-bottom: 1.5rem;
+  }
+  .card[data-open="1"] .card-body { display: block; }
+  .card-body > .gutter { display: none; }
+  .card-body > .content { min-width: 0; }
+
+  .rec-hint {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ink-medium);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0 0 1.75rem;
+  }
+  .rec-hint::before {
+    content: "推荐";
+    display: inline-block;
+    font-family: var(--sans);
+    font-style: normal;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--clay);
+    border-bottom: 1px solid var(--clay);
+    padding-bottom: 1px;
+    margin-right: .8em;
+    vertical-align: .12em;
+  }
+  .rec-hint b {
+    font-style: normal;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* Options */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: .55rem;
+  }
+
+  .opt {
+    position: relative;
+    text-align: left;
+    padding: .95rem 1.15rem;
+    background: var(--paper-light);
+    border: 1px solid var(--pencil-soft);
+    border-radius: 4px;
+    font-family: var(--serif);
+    font-size: 1rem;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all .22s cubic-bezier(.2,.7,.2,1);
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+  }
+  .opt:hover {
+    border-color: var(--ink-faded);
+    background: var(--paper);
+    transform: translateX(2px);
+  }
+  .opt:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+  .opt .key {
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ink-faded);
+    font-size: .95rem;
+    flex-shrink: 0;
+    min-width: 1.2rem;
+  }
+
+  /* Option tags — flexible system, agent decides which to apply where.
+     Wrap one or more <span class="opt-tag tag-X"> inside <span class="opt-tags">.
+     Built-in semantics: tag-rec (clay/orange, "推荐"), tag-current (moss/green, "当前").
+     Add more tag-* variants below as needed. */
+  .opt-tags {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+  .opt-tag {
+    font-family: var(--sans);
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    padding-bottom: 1px;
+    border-bottom: 1px solid currentColor;
+  }
+  .opt-tag.tag-rec     { color: var(--clay); }
+  .opt-tag.tag-current { color: var(--moss); }
+  .opt[data-selected="1"] .opt-tag {
+    color: color-mix(in srgb, var(--paper) 78%, transparent);
+    border-bottom-color: color-mix(in srgb, var(--paper) 60%, transparent);
+  }
+
+  /* Selected — ink fill */
+  .opt[data-selected="1"] {
+    border-color: var(--ink);
+    background: var(--ink);
+    color: var(--paper-light);
+  }
+  .opt[data-selected="1"] .key {
+    color: color-mix(in srgb, var(--paper) 50%, transparent);
+  }
+
+  /* Rich option */
+  .opt-rich {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0;
+    overflow: hidden;
+    gap: 0;
+  }
+  /* Rich option hover — match plain opt feel */
+  .opt-rich:hover {
+    border-color: var(--ink-faded);
+    transform: translateX(2px);
+  }
+  .opt-rich .opt-preview {
+    padding: 1.25rem 1.3rem 1.05rem;
+    background: var(--paper);
+    border-bottom: 1px solid var(--pencil-soft);
+    color: var(--ink-medium);
+    font-style: italic;
+    font-size: .92rem;
+    transition: background .22s ease;
+  }
+  .opt-rich .opt-preview h4 {
+    margin: 0 0 .65rem;
+    font-family: var(--sans);
+    font-style: normal;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--clay);
+  }
+  .opt-rich .opt-preview .row {
+    padding: .35rem 0;
+    border-bottom: 1px dashed var(--pencil);
+  }
+  .opt-rich .opt-preview .row:last-child { border-bottom: 0; }
+  .opt-rich .opt-preview .pill {
+    display: inline-block;
+    font-family: var(--sans);
+    font-style: normal;
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: .06em;
+    color: var(--ink-medium);
+    border: 1px solid var(--pencil);
+    padding: .1rem .45rem;
+    border-radius: 2px;
+    vertical-align: 1px;
+  }
+  .opt-rich .opt-preview pre.mermaid {
+    background: transparent;
+    margin: 0;
+    text-align: center;
+    font-family: var(--sans);
+    font-style: normal;
+  }
+  /* Pros & cons — every preset option should declare both */
+  .opt-preview .pros-cons {
+    list-style: none;
+    margin: .9rem 0 0;
+    padding: 0;
+    font-style: normal;
+    font-size: .85rem;
+    line-height: 1.55;
+  }
+  .opt-preview .pros-cons li {
+    padding: .15rem 0 .15rem 1.35rem;
+    position: relative;
+    color: var(--ink);
+  }
+  .opt-preview .pros-cons li.pro::before,
+  .opt-preview .pros-cons li.con::before {
+    position: absolute;
+    left: 0;
+    top: .12rem;
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: .9rem;
+    line-height: 1.55;
+  }
+  .opt-preview .pros-cons li.pro::before { content: "+"; color: var(--moss); }
+  .opt-preview .pros-cons li.con::before { content: "−"; color: var(--rust); }
+  /* ── Mermaid SVG: brand palette override (sequence/flowchart/state/ER/class) ── */
+  pre.mermaid svg { background: transparent !important; max-width: 100%; height: auto; }
+
+  /* ── Mermaid text (covers flowchart, sequence, state, ER, class) ── */
+  pre.mermaid svg text,
+  pre.mermaid svg tspan,
+  pre.mermaid svg .nodeLabel,
+  pre.mermaid svg .edgeLabel,
+  pre.mermaid svg .messageText,
+  pre.mermaid svg .noteText,
+  pre.mermaid svg .titleText,
+  pre.mermaid svg .stateLabel,
+  pre.mermaid svg .classText {
+    fill: var(--ink) !important;
+    color: var(--ink) !important;
+    font-family: var(--sans) !important;
+    /* font-size left to mermaid; forcing breaks flowchart layout */
+    font-style: normal !important;
+  }
+  /* Edge labels' wrapping foreignObject sometimes hosts the text */
+  pre.mermaid svg foreignObject div,
+  pre.mermaid svg foreignObject span {
+    color: var(--ink) !important;
+    background: transparent !important;
+    font-family: var(--sans) !important;
+  }
+  /* Background pill behind edge labels */
+  pre.mermaid svg .edgeLabel rect,
+  pre.mermaid svg .label rect,
+  pre.mermaid svg rect.labelBox {
+    fill: var(--paper-light) !important;
+    stroke: none !important;
+  }
+
+  /* ── Mermaid shapes (flowchart nodes, actors, ER, state, class) ── */
+  pre.mermaid svg .node rect,
+  pre.mermaid svg .node circle,
+  pre.mermaid svg .node ellipse,
+  pre.mermaid svg .node polygon,
+  pre.mermaid svg .node path,
+  pre.mermaid svg .actor,
+  pre.mermaid svg .classGroup rect,
+  pre.mermaid svg .er.entityBox,
+  pre.mermaid svg .state,
+  pre.mermaid svg .cluster rect {
+    fill: var(--paper-light) !important;
+    stroke: var(--ink-medium) !important;
+    stroke-width: 1px !important;
+  }
+  /* ── Lines & edges ── */
+  pre.mermaid svg .edgePath path,
+  pre.mermaid svg path.path,
+  pre.mermaid svg .messageLine0,
+  pre.mermaid svg .messageLine1,
+  pre.mermaid svg path.messageLine0,
+  pre.mermaid svg path.messageLine1,
+  pre.mermaid svg .relationshipLine,
+  pre.mermaid svg .transition,
+  pre.mermaid svg line:not(.actor-line),
+  pre.mermaid svg .flowchart-link {
+    stroke: var(--ink-medium) !important;
+    fill: none !important;
+  }
+  /* Sequence-diagram dashed lifelines stay softer */
+  pre.mermaid svg line.actor-line,
+  pre.mermaid svg .actor-line {
+    stroke: var(--pencil) !important;
+  }
+
+  /* ── Arrowheads / markers ── */
+  pre.mermaid svg marker path,
+  pre.mermaid svg defs marker path,
+  pre.mermaid svg #arrowhead path,
+  pre.mermaid svg [id*="arrowhead"] path,
+  pre.mermaid svg [id*="filledhead"] path {
+    fill: var(--ink-medium) !important;
+    stroke: var(--ink-medium) !important;
+  }
+
+  /* ── Notes / callouts — clay-tinted accent ── */
+  pre.mermaid svg .note,
+  pre.mermaid svg rect.note,
+  pre.mermaid svg .noteBkg {
+    fill: var(--clay-tint) !important;
+    stroke: var(--clay) !important;
+  }
+
+  .opt-rich .opt-label {
+    padding: 1rem 1.15rem;
+    background: var(--paper-light);
+    display: flex;
+    align-items: center;
+    gap: .9rem;
+    font-weight: 500;
+    font-size: 1.04rem;
+    transition: background .22s ease;
+  }
+  .opt-rich:hover .opt-label { background: var(--paper); }
+  .opt-rich:hover .opt-preview { background: var(--paper-light); }
+
+  /* Rich tags — float to top-right of the whole card, stack horizontally */
+  .opt-rich .opt-tags {
+    position: absolute;
+    top: .9rem;
+    right: 1rem;
+    z-index: 1;
+    margin-left: 0;
+  }
+  .opt-rich .opt-tag {
+    background: var(--paper-light);
+    padding: .2rem .55rem;
+    border: 1px solid currentColor;
+    border-radius: 2px;
+    /* override hairline from default */
+    border-bottom: 1px solid currentColor;
+  }
+  .opt-rich[data-selected="1"] {
+    background: transparent;
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .opt-rich[data-selected="1"] .opt-preview {
+    background: var(--paper-deep);
+    border-bottom-color: var(--ink);
+  }
+  .opt-rich[data-selected="1"] .opt-label {
+    background: var(--ink);
+    color: var(--paper-light);
+  }
+  .opt-rich[data-selected="1"] .opt-label .key {
+    color: color-mix(in srgb, var(--paper) 50%, transparent);
+  }
+  .opt-rich[data-selected="1"] .opt-tag {
+    background: var(--ink);
+    color: color-mix(in srgb, var(--paper) 85%, transparent);
+    border-color: color-mix(in srgb, var(--paper) 55%, transparent);
+  }
+
+  /* Custom input option */
+  .opt-input {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    padding: 0;
+    background: var(--paper-light);
+    border: 1px solid var(--pencil-soft);
+    border-radius: 4px;
+    overflow: hidden;
+    cursor: text;
+    transition: all .22s cubic-bezier(.2,.7,.2,1);
+  }
+  .opt-input:hover, .opt-input:focus-within {
+    border-color: var(--ink-faded);
+    background: var(--paper);
+  }
+  .opt-input .key {
+    padding: .95rem 0 .95rem 1.15rem;
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ink-faded);
+    font-size: .95rem;
+    flex-shrink: 0;
+    min-width: 1.2rem;
+    align-self: center;
+  }
+  .opt-input input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 1rem;
+    padding: .95rem .9rem;
+  }
+  .opt-input input:focus { outline: 0; }
+  .opt-input input::placeholder {
+    color: var(--ink-faded);
+    font-style: italic;
+  }
+  .opt-input .confirm {
+    background: transparent;
+    border: 0;
+    border-left: 1px solid var(--pencil-soft);
+    color: var(--ink-medium);
+    padding: 0 1.25rem;
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all .2s ease;
+    flex-shrink: 0;
+  }
+  .opt-input .confirm:hover:not(:disabled) {
+    background: var(--ink);
+    color: var(--paper-light);
+  }
+  .opt-input .confirm:disabled {
+    opacity: .3;
+    cursor: not-allowed;
+  }
+  .opt-input[data-selected="1"] {
+    background: var(--ink);
+    border-color: var(--ink);
+  }
+  .opt-input[data-selected="1"] .key {
+    color: color-mix(in srgb, var(--paper) 50%, transparent);
+  }
+  .opt-input[data-selected="1"] input {
+    color: var(--paper-light);
+  }
+  .opt-input[data-selected="1"] input::placeholder {
+    color: color-mix(in srgb, var(--paper) 40%, transparent);
+  }
+  .opt-input[data-selected="1"] .confirm {
+    border-left-color: color-mix(in srgb, var(--paper) 20%, transparent);
+    color: var(--paper-light);
+  }
+  .opt-input[data-selected="1"] .confirm:hover:not(:disabled) {
+    background: var(--clay);
+  }
+
+  /* ───────── Inline output section (below questions) ───────── */
+  .output {
+    margin-top: 2rem;
+  }
+  .panel-head {
+    display: flex;
+    align-items: baseline;
+    gap: 1.1rem;
+    padding: 0 0 .55rem;
+    user-select: none;
+  }
+
+  /* Sticky summary bar — title bar + progress + Reset/Copy, always visible */
+  .summary-bar {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    background: var(--paper-light);
+    border-top: 1px solid var(--pencil-soft);
+    z-index: 50;
+    box-shadow: 0 -2px 14px rgba(0,0,0,.04);
+  }
+  .summary-bar .progress-track {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--pencil-soft);
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0;
+    background: var(--clay);
+    transition: background-color .3s ease;
+  }
+  body[data-all-done="1"] .progress-fill { background: var(--moss); }
+  .summary-bar .summary-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: .65rem clamp(1rem, 4vw, 2.25rem) calc(.65rem + env(safe-area-inset-bottom, 0px));
+  }
+  .summary-bar .summary-label {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink-faded);
+    flex: 1;
+    min-width: 0;
+  }
+  body[data-all-done="1"] .summary-bar .summary-label {
+    color: var(--moss);
+  }
+  .panel-head h3 {
+    margin: 0;
+    font-family: var(--serif);
+    font-weight: 500;
+    font-size: 1.05rem;
+    letter-spacing: -.005em;
+  }
+  .copy-link {
+    font-family: var(--sans);
+    font-size: 12.5px;
+    font-weight: 500;
+    letter-spacing: .02em;
+    color: var(--clay);
+    cursor: pointer;
+    background: transparent;
+    border: 1px solid var(--clay);
+    padding: .35rem .85rem;
+    border-radius: 4px;
+    transition: all .2s ease;
+  }
+  .copy-link:hover {
+    background: var(--clay);
+    color: var(--paper-light);
+  }
+  .copy-link[data-copied="1"] {
+    color: var(--paper-light);
+    background: var(--moss);
+    border-color: var(--moss);
+    font-weight: 600;
+    pointer-events: none;
+    animation: copiedPop .42s ease;
+  }
+  @keyframes copiedPop {
+    0%   { transform: scale(1); }
+    45%  { transform: scale(1.1); }
+    100% { transform: scale(1); }
+  }
+  .output .body {
+    padding: .6rem 0 0;
+  }
+  .output textarea#md-out {
+    display: block;
+    width: 100%;
+    margin: 0;
+    padding: .65rem .85rem;
+    background: var(--paper-light);
+    color: var(--ink);
+    border: 1px solid var(--pencil-soft);
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.7;
+    resize: none;
+    outline: none;
+    box-sizing: border-box;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    overflow: hidden;  /* no internal scroll — JS auto-grows height */
+  }
+  .output textarea#md-out:focus {
+    border-color: var(--clay);
+  }
+  .output textarea#md-out[data-dirty="1"] {
+    border-left: 2px solid var(--clay);
+  }
+
+  /* ── Default mockup frame — reusable container for UI/animation/font previews ──
+     Use:  <div class="mockup-frame" style="padding:.85rem 1rem; ...">...</div>
+     (padding/display/flex set per mockup; this class owns bg + border + radius) */
+  .mockup-frame {
+    background: var(--paper);
+    border: 1px solid var(--pencil-soft);
+    border-radius: 6px;
+    font-style: normal;
+  }
+
+  /* ── Default code-snippet component ──────────────────────────────
+     Reusable code block for any "compare different code snippets" question.
+     Usage:
+       <div class="code-snippet">
+         <div class="code-head"><span class="code-lang">typescript</span></div>
+         <pre>const x = 1;</pre>
+       </div>
+     Optional syntax-highlight spans inside <pre>:
+       <span class="tok-kw">const</span>, .tok-id, .tok-str, .tok-num, .tok-cmt */
+  .code-snippet {
+    background: var(--paper);
+    border: 1px solid var(--pencil);
+    border-radius: 6px;
+    overflow: hidden;
+    font-style: normal;  /* opt out of .opt-preview's default italic */
+  }
+  .code-snippet .code-head {
+    background: var(--paper-deep);
+    padding: .3rem .7rem;
+    font-family: var(--sans);
+    font-size: .7rem;
+    color: var(--ink-faded);
+    letter-spacing: .04em;
+  }
+  .code-snippet pre {
+    margin: 0;
+    padding: .55rem .75rem;
+    font-family: var(--mono);
+    font-size: .74rem;
+    line-height: 1.6;
+    color: var(--ink);
+    background: transparent;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .code-snippet .tok-kw  { color: #a55a30; }
+  .code-snippet .tok-id  { color: #5a7a90; }
+  .code-snippet .tok-str { color: #6b8e64; }
+  .code-snippet .tok-num { color: #8a6d3b; }
+  .code-snippet .tok-cmt { color: var(--ink-faded); font-style: italic; }
+
+  /* ── Themed scrollbars ───────────────────────────────────────── */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--pencil) transparent;
+  }
+  *::-webkit-scrollbar { width: 10px; height: 10px; }
+  *::-webkit-scrollbar-track { background: transparent; }
+  *::-webkit-scrollbar-thumb {
+    background: var(--pencil);
+    border-radius: 999px;
+    border: 2px solid var(--paper);
+    background-clip: padding-box;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: var(--ink-faded);
+    border: 2px solid var(--paper);
+    background-clip: padding-box;
+  }
+  *::-webkit-scrollbar-corner { background: transparent; }
+  .output textarea#md-out::-webkit-scrollbar-thumb {
+    border-color: var(--paper-light);
+  }
+  .output textarea#md-out::-webkit-scrollbar-thumb:hover {
+    border-color: var(--paper-light);
+  }
+  .reset-link {
+    font-family: var(--sans);
+    font-size: 11px;
+    color: var(--ink-faded);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0 .35rem;
+    letter-spacing: .04em;
+    display: none;
+  }
+  .reset-link:hover { color: var(--clay); }
+  body[data-md-dirty="1"] .reset-link { display: inline-block; }
+
+  .warn-row {
+    display: none;
+    position: fixed;
+    left: 0; right: 0;
+    bottom: calc(2.85rem + env(safe-area-inset-bottom, 0px));  /* sits on top of .summary-bar */
+    z-index: 51;
+    align-items: center;
+    gap: 1rem;
+    padding: .85rem clamp(1rem, 4vw, 2.25rem);
+    background: var(--paper-deep);
+    border-top: 1px solid var(--clay);
+    border-bottom: 1px solid var(--pencil);
+    font-family: var(--serif);
+    font-size: .95rem;
+    color: var(--ink);
+  }
+  .warn-row[data-show="1"] { display: flex; }
+  .warn-row .msg {
+    flex: 1;
+    font-style: italic;
+  }
+  .warn-row .msg b {
+    font-style: normal;
+    font-weight: 600;
+    color: var(--clay-deep);
+  }
+  @media (prefers-color-scheme: dark) {
+    .warn-row .msg b { color: var(--clay); }
+  }
+  .warn-row .ghost {
+    background: transparent;
+    border: 1px solid var(--ink-faded);
+    color: var(--ink);
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: .9rem;
+    padding: .35rem .9rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all .18s ease;
+  }
+  .warn-row .ghost:hover {
+    background: var(--ink);
+    color: var(--paper-light);
+    border-color: var(--ink);
+  }
+
+  /* Q2 demo animations — looping indicators for chat-streaming options */
+  @keyframes demo-cursor-blink {
+    0%, 49%   { opacity: 1; }
+    50%, 100% { opacity: 0; }
+  }
+  @keyframes demo-dots {
+    0%, 60%, 100% { transform: translateY(0); opacity: .55; }
+    30%           { transform: translateY(-3px); opacity: 1; }
+  }
+  @keyframes demo-fade-token {
+    0%, 6%   { opacity: 0; transform: translateY(2px); }
+    20%, 80% { opacity: 1; transform: translateY(0); }
+    95%, 100%{ opacity: 0; }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  main > * { animation: fadeUp .45s cubic-bezier(.2,.7,.2,1) both; }
+  main > *:nth-child(2) { animation-delay: .05s; }
+  main > *:nth-child(3) { animation-delay: .1s; }
+  #questions .card { animation: fadeUp .45s cubic-bezier(.2,.7,.2,1) both; }
+  #questions .card:nth-child(1) { animation-delay: .12s; }
+  #questions .card:nth-child(2) { animation-delay: .18s; }
+  #questions .card:nth-child(3) { animation-delay: .24s; }
+  #questions .card:nth-child(4) { animation-delay: .3s; }
+
+  @media (max-width: 600px) {
+    .card-header {
+      grid-template-columns: 2rem 1fr auto;
+      gap: .9rem;
+    }
+    .card-body {
+      grid-template-columns: 0 1fr;
+      gap: 0;
+    }
+    .qnum { font-size: 1.25rem; }
+    .title-text { font-size: 1.15rem; }
+    .lede { font-size: 1.05rem; }
+  }
+</style>
+</head>
+<body>
+
+<main>
+  <div class="masthead">
+    <span class="eyebrow"><span class="dot"></span>Grill · 第 1 轮</span>
+    <span class="topic">AI chat 对话界面</span>
+  </div>
+  <p class="lede">从形态、节奏到内容——六道关键决策定调 AI chat 界面的性格。</p>
+
+  <div id="questions">
+
+    <!-- ════════════════════════════════════════════════════════════════
+         INSERT QUESTIONS HERE — AI chat patterns gallery
+         ════════════════════════════════════════════════════════════════ -->
+
+    <!-- ─────────── Q1 START · PATTERN: UI 布局 — HTML/CSS mockup 大块视觉对比 ───────────
+         Replace card content below. Do not edit past the matching Q1 END marker.
+         Do not touch CSS/JS or the closing </div> structure — only the card content. -->
+    <div class="card" data-id="q1" data-open="1">
+      <button type="button" class="card-header">
+        <span class="qnum">Q1.</span>
+        <span class="title-group">
+          <span class="title-text">回复消息的整体排版语言？</span>
+          <span class="selected-label"></span>
+        </span>
+        <span class="chevron"></span>
+      </button>
+      <div class="card-body">
+        <div class="gutter"></div>
+        <div class="content">
+          <p class="q-desc">助手的回复怎么呈现给用户——决定整体的"对话感"vs"文档感"，影响长回复的阅读舒适度、信息密度、滚动节奏。</p>
+          <p class="rec-hint"><b>Document 文档风</b> — 长回复阅读舒适、信息密度高；除非专做对话社交产品（IM、Discord 类），别强加 bubble。</p>
+          <div class="options">
+
+            <button type="button" class="opt opt-rich" data-value="document" data-rec="1" data-label="A. Document 文档风">
+              <span class="opt-tags"><span class="opt-tag tag-current">当前</span><span class="opt-tag tag-rec">推荐</span></span>
+              <div class="opt-preview" style="font-style:normal;">
+                <div class="mockup-frame" style="padding:.85rem .9rem;">
+                  <div style="font-size:.62rem; color:var(--ink-faded); text-transform:uppercase; letter-spacing:.1em; margin-bottom:.4rem;">Assistant</div>
+                  <div style="height:5px; background:var(--ink-medium); border-radius:1px; margin-bottom:.32rem;"></div>
+                  <div style="height:5px; background:var(--ink-medium); border-radius:1px; margin-bottom:.32rem; width:88%;"></div>
+                  <div style="height:5px; background:var(--ink-medium); border-radius:1px; width:70%;"></div>
+                </div>
+                <ul class="pros-cons">
+                  <li class="pro">长回复阅读舒适，行宽可达 70+ 字符</li>
+                  <li class="pro">代码、表格、长 markdown 不被气泡限宽挤压</li>
+                  <li class="pro">视觉简洁，信息密度高</li>
+                  <li class="con">缺少强烈的"对话感"，新手可能觉得冷</li>
+                </ul>
+              </div>
+              <div class="opt-label"><span class="key">A.</span>Document 文档风</div>
+            </button>
+
+            <button type="button" class="opt opt-rich" data-value="bubble" data-label="B. Bubble 聊天风">
+              <div class="opt-preview" style="font-style:normal;">
+                <div class="mockup-frame" style="padding:.7rem; display:flex; flex-direction:column; gap:.4rem;">
+                  <div style="align-self:flex-end; background:var(--ink); padding:.4rem .6rem; border-radius:8px 8px 0 8px; max-width:60%; min-width:35%;">
+                    <div style="height:4px; background:var(--paper); border-radius:1px; width:88%; opacity:.7;"></div>
+                  </div>
+                  <div style="align-self:flex-start; background:var(--paper-light); border:1px solid var(--pencil); padding:.4rem .6rem; border-radius:8px 8px 8px 0; max-width:78%;">
+                    <div style="height:4px; background:var(--ink-medium); border-radius:1px; margin-bottom:.22rem;"></div>
+                    <div style="height:4px; background:var(--ink-medium); border-radius:1px; width:80%;"></div>
+                  </div>
+                </div>
+                <ul class="pros-cons">
+                  <li class="pro">强对话感，符合 IM 用户习惯</li>
+                  <li class="pro">用户/助手视觉边界清晰</li>
+                  <li class="con">气泡限宽，长内容/代码块被压缩</li>
+                  <li class="con">不适合密集信息（表格、markdown）</li>
+                </ul>
+              </div>
+              <div class="opt-label"><span class="key">B.</span>Bubble 聊天风</div>
+            </button>
+
+            <button type="button" class="opt opt-rich" data-value="card" data-label="C. Card 卡片风">
+              <div class="opt-preview" style="font-style:normal;">
+                <div class="mockup-frame" style="padding:.6rem; display:flex; flex-direction:column; gap:.45rem;">
+                  <div style="background:var(--paper-light); border:1px solid var(--pencil); box-shadow:0 1px 2px rgba(0,0,0,.06); padding:.45rem .6rem; border-radius:5px;">
+                    <div style="font-size:.55rem; color:var(--ink-faded); margin-bottom:.22rem;">User</div>
+                    <div style="height:4px; background:var(--ink-medium); border-radius:1px; width:70%;"></div>
+                  </div>
+                  <div style="background:var(--paper-light); border:1px solid var(--pencil); box-shadow:0 1px 2px rgba(0,0,0,.06); padding:.45rem .6rem; border-radius:5px;">
+                    <div style="font-size:.55rem; color:var(--ink-faded); margin-bottom:.22rem;">Assistant</div>
+                    <div style="height:4px; background:var(--ink-medium); border-radius:1px; margin-bottom:.2rem;"></div>
+                    <div style="height:4px; background:var(--ink-medium); border-radius:1px; width:75%;"></div>
+                  </div>
+                </div>
+                <ul class="pros-cons">
+                  <li class="pro">每条消息边界最清晰</li>
+                  <li class="pro">适合需要对每条消息操作（复制/分享/打分）</li>
+                  <li class="con">视觉重，注意力被切割</li>
+                  <li class="con">长对话时累计视觉噪音大</li>
+                </ul>
+              </div>
+              <div class="opt-label"><span class="key">C.</span>Card 卡片风</div>
+            </button>
+
+            <div class="opt opt-input">
+              <span class="key">D.</span>
+              <input type="text" placeholder="其他排版语言…">
+              <button type="button" class="confirm" disabled aria-label="提交">↵</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ─────────── Q1 END ─────────── -->
+
+    <!-- ─────────── Q2 START · PATTERN: 动画效果 — CSS @keyframes live demo ───────────
+         Replace card content below. Do not edit past the matching Q2 END marker.
+         Do not touch CSS/JS or the closing </div> structure — only the card content. -->
+    <div class="card" data-id="q2">
+      <button type="button" class="card-header">
+        <span class="qnum">Q2.</span>
+        <span class="title-group">
+          <span class="title-text">流式生成的视觉指针？</span>
+          <span class="selected-label"></span>
+        </span>
+        <span class="chevron"></span>
+      </button>
+      <div class="card-body">
+        <div class="gutter"></div>
+        <div class="content">
+          <p class="q-desc">助手正在生成回复时，给用户的"还在打字"信号——影响等待时的注意力锚定，以及对生成速度的感知。</p>
+          <p class="rec-hint"><b>光标闪烁</b> — 占用最少空间、符合"AI 正在写"的直觉、不抢注意力；最稳健的默认。</p>
+          <div class="options">
+
+            <button type="button" class="opt opt-rich" data-value="cursor" data-rec="1" data-label="A. 光标闪烁">
+              <span class="opt-tags"><span class="opt-tag tag-rec">推荐</span></span>
+              <div class="opt-preview" style="font-style:normal;">
+                <div class="mockup-frame" style="padding:1rem 1.1rem; display:flex; align-items:center; gap:.2rem; min-height:3.2rem;">
+                  <span style="font-family:var(--sans); font-size:.92rem; color:var(--ink);">让我想想这个问题</span>
+                  <span style="display:inline-block; width:2px; height:1.05em; background:var(--clay); animation: demo-cursor-blink 1s steps(1) infinite; margin-left:1px;"></span>
+                </div>
+                <ul class="pros-cons">
+                  <li class="pro">占用空间极小</li>
+                  <li class="pro">语义直觉强（"光标 = 正在打字"）</li>
+                  <li class="pro">不分散注意力，可与正常输出无缝衔接</li>
+                  <li class="con">新手可能没注意，等待感弱</li>
+                </ul>
+              </div>
+              <div class="opt-label"><span class="key">A.</span>光标闪烁</div>
+            </button>
+
+            <button type="button" class="opt opt-rich" data-value="dots" data-label="B. 三点跳动指示器">
+              <div class="opt-preview" style="font-style:normal;">
+                <div class="mockup-frame" style="padding:1rem 1.1rem; display:flex; align-items:center; gap:.3rem; min-height:3.2rem;">
+                  <span style="font-family:var(--sans); font-size:.92rem; color:var(--ink-medium); margin-right:.4rem;">思考中</span>
+                  <span style="display:inline-block; width:5px; height:5px; border-radius:50%; background:var(--clay); animation: demo-dots 1.1s ease-in-out infinite;"></span>
+                  <span style="display:inline-block; width:5px; height:5px; border-radius:50%; background:var(--clay); animation: demo-dots 1.1s ease-in-out .15s infinite;"></span>
+                  <span style="display:inline-block; width:5px; height:5px; border-radius:50%; background:var(--clay); animation: demo-dots 1.1s ease-in-out .3s infinite;"></span>
+                </div>
+                <ul class="pros-cons">
+                  <li class="pro">显著的"启动"信号，新手立刻识别</li>
+                  <li class="pro">"等待感"明确，符合 IM 习惯</li>
+                  <li class="con">token 来后突然消失，过渡有跳跃</li>
+                  <li class="con">长时间显示会让用户焦虑</li>
+                </ul>
+              </div>
+              <div class="opt-label"><span class="key">B.</span>三点跳动指示器</div>
+            </button>
+
+            <button type="button" class="opt opt-rich" data-value="fade" data-label="C. 文字逐字渐显">
+              <div class="opt-preview" style="font-style:normal;">
+                <div class="mockup-frame" style="padding:1rem 1.1rem; min-height:3.2rem; display:flex; align-items:center; font-family:var(--sans); font-size:.92rem; color:var(--ink);">
+                  <span style="opacity:0; animation: demo-fade-token 3s ease 0s infinite;">让</span>
+                  <span style="opacity:0; animation: demo-fade-token 3s ease .2s infinite;">我</span>
+                  <span style="opacity:0; animation: demo-fade-token 3s ease .4s infinite;">想</span>
+                  <span style="opacity:0; animation: demo-fade-token 3s ease .6s infinite;">想</span>
+                  <span style="opacity:0; animation: demo-fade-token 3s ease .8s infinite;">这</span>
+                  <span style="opacity:0; animation: demo-fade-token 3s ease 1s infinite;">个</span>
+                  <span style="opacity:0; animation: demo-fade-token 3s ease 1.2s infinite;">问</span>
+                  <span style="opacity:0; animation: demo-fade-token 3s ease 1.4s infinite;">题</span>
+                </div>
+                <ul class="pros-cons">
+                  <li class="pro">优雅平滑，有"被认真打"的仪式感</li>
+                  <li class="pro">视觉柔和不刺眼</li>
+                  <li class="con">显著拖慢感知速度（动画时间 ≈ 实际生成时间）</li>
+                  <li class="con">密集 token 时动效互相打架，反而显乱</li>
+                </ul>
+              </div>
+              <div class="opt-label"><span class="key">C.</span>文字逐字渐显</div>
+            </button>
+
+            <div class="opt opt-input">
+              <span class="key">D.</span>
+              <input type="text" placeholder="其他动效…">
+              <button type="button" class="confirm" disabled aria-label="提交">↵</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ─────────── Q2 END ─────────── -->
+
+    <!-- ─────────── Q3 START · PATTERN: 流程相关 — Mermaid flowchart 分支对比 ───────────
+         Replace card content below. Do not edit past the matching Q3 END marker.
+         Do not touch CSS/JS or the closing </div> structure — only the card content. -->
+    <div class="card" data-id="q3">
+      <button type="button" class="card-header">
+        <span class="qnum">Q3.</span>
+        <span class="title-group">
+          <span class="title-text">消息发送失败时的兜底流程？</span>
+          <span class="selected-label"></span>
+        </span>
+        <span class="chevron"></span>
+      </button>
+      <div class="card-body">
+        <div class="gutter"></div>
+        <div class="content">
+          <p class="q-desc">网络抖动、模型超时、限流都会让一条消息失败——决定用户在出错时看到什么、要不要自己动手，以及账单/可靠性的权衡。</p>
+          <p class="rec-hint"><b>自动指数退避 N 次后报错</b> — 大多数失败是瞬时抖动，自动重试能消化掉 90% 噪音；同时设上限避免无限循环。</p>
+          <div class="options">
+
+            <button type="button" class="opt opt-rich" data-value="manual-retry" data-label="A. 立即报错 + 手动重试">
+              <span class="opt-tags"><span class="opt-tag tag-current">当前</span></span>
+              <div class="opt-preview">
+<pre class="mermaid">
+flowchart TD
+  A[发送消息] --> B{成功?}
+  B -- 是 --> C[展示回复]
+  B -- 否 --> D[红色错误气泡]
+  D --> E[显示 重试 按钮]
+  E --> F[用户点击重试]
+  F --> A
+</pre>
+                <ul class="pros-cons">
+                  <li class="pro">实现最简单，行为完全透明</li>
+                  <li class="pro">用户完全掌控；不会偷偷烧 token</li>
+                  <li class="con">瞬时抖动也要用户手动操作，体验割裂</li>
+                  <li class="con">频繁失败时用户负担重</li>
+                </ul>
+              </div>
+              <div class="opt-label"><span class="key">A.</span>立即报错 + 手动重试</div>
+            </button>
+
+            <button type="button" class="opt opt-rich" data-value="auto-retry" data-rec="1" data-label="B. 自动指数退避（推荐）">
+              <span class="opt-tags"><span class="opt-tag tag-rec">推荐</span></span>
+              <div class="opt-preview">
+<pre class="mermaid">
+flowchart TD
+  A[发送消息] --> B{成功?}
+  B -- 是 --> C[展示回复]
+  B -- 否 --> D{还能重试?}
+  D -- 是 --> E[等待 2^n 秒]
+  E --> A
+  D -- 否 --> F[展示错误 · 提供重试]
+</pre>
+                <ul class="pros-cons">
+                  <li class="pro">瞬时抖动对用户无感</li>
+                  <li class="pro">退避避免雪崩；上限避免死循环</li>
+                  <li class="con">隐藏的成本——失败时仍在烧 token</li>
+                  <li class="con">实现稍复杂，需要状态机和上限</li>
+                </ul>
+              </div>
+              <div class="opt-label"><span class="key">B.</span>自动指数退避 N 次后报错</div>
+            </button>
+
+            <button type="button" class="opt opt-rich" data-value="fallback-model" data-label="C. 降级到备用模型">
+              <div class="opt-preview">
+<pre class="mermaid">
+flowchart TD
+  A[发送消息] --> B{主模型成功?}
+  B -- 是 --> C[展示回复]
+  B -- 否 --> D[切换到备用小模型]
+  D --> E{备用成功?}
+  E -- 是 --> F[展示回复 · 标注 备用]
+  E -- 否 --> G[最终报错]
+</pre>
+                <ul class="pros-cons">
+                  <li class="pro">几乎不会让用户看到彻底失败</li>
+                  <li class="pro">主模型限流/宕机时仍可用</li>
+                  <li class="con">回复质量降级，用户可能未察觉</li>
+                  <li class="con">需要维护备用通道，运维复杂度上升</li>
+                </ul>
+              </div>
+              <div class="opt-label"><span class="key">C.</span>降级到备用 / 小模型</div>
+            </button>
+
+            <div class="opt opt-input">
+              <span class="key">D.</span>
+              <input type="text" placeholder="其他兜底策略…">
+              <button type="button" class="confirm" disabled aria-label="提交">↵</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ─────────── Q3 END ─────────── -->
+
+    <!-- ─────────── Q4 START · PATTERN: 字体选择 — 品牌名 wordmark 大字号对照 ───────────
+         Replace card content below. Do not edit past the matching Q4 END marker.
+         Do not touch CSS/JS or the closing </div> structure — only the card content. -->
+    <div class="card" data-id="q4">
+      <button type="button" class="card-header">
+        <span class="qnum">Q4.</span>
+        <span class="title-group">
+          <span class="title-text">品牌 wordmark 用哪款衬线？</span>
+          <span class="selected-label"></span>
+        </span>
+        <span class="chevron"></span>
+      </button>
+      <div class="card-body">
+        <div class="gutter"></div>
+        <div class="content">
+          <p class="q-desc">Wordmark 的字体决定品牌一眼之间的"调性"——编辑 / 奢华 / 独立 / 现代。正文和 UI 字体之后再定，品牌名是第一印象。</p>
+          <p class="rec-hint"><b>Source Serif 4</b> — 编辑感的温度但不矫情；读起来是"考究、聪明的产品"（Anthropic / Stripe Press 路线）。</p>
+          <div class="options">
+
+            <button type="button" class="opt opt-rich" data-value="source-serif" data-rec="1" data-label="A. Source Serif 4（编辑温度）">
+              <span class="opt-tags"><span class="opt-tag tag-rec">推荐</span></span>
+              <div class="opt-preview">
+                <div class="mockup-frame" style="padding:1.4rem 1rem; text-align:center; font-style:normal;">
+                  <div style="font-family:'Source Serif 4', Georgia, serif; font-size:2.9rem; font-weight:600; color:var(--ink); line-height:1; letter-spacing:-.005em;">Aurora</div>
+                  <div style="font-family:var(--sans); font-size:.6rem; color:var(--ink-faded); text-transform:uppercase; letter-spacing:.14em; margin-top:.6rem;">Source Serif 4 · 600</div>
+                </div>
+                <ul class="pros-cons">
+                  <li class="pro">编辑温度而不矫情</li>
+                  <li class="pro">wordmark 与正文同款字体——无需额外字体</li>
+                  <li class="pro">中文衬线 fallback 表现稳定</li>
+                  <li class="con">辨识度一般——编辑科技赛道太常见</li>
+                </ul>
+              </div>
+              <div class="opt-label"><span class="key">A.</span>Source Serif 4</div>
+            </button>
+
+            <button type="button" class="opt opt-rich" data-value="playfair" data-label="B. Playfair Display（奢华 / 杂志）">
+              <div class="opt-preview">
+                <div class="mockup-frame" style="padding:1.4rem 1rem; text-align:center; font-style:normal;">
+                  <div style="font-family:'Playfair Display', serif; font-size:3rem; font-weight:700; color:var(--ink); line-height:1; letter-spacing:-.012em;">Aurora</div>
+                  <div style="font-family:var(--sans); font-size:.6rem; color:var(--ink-faded); text-transform:uppercase; letter-spacing:.14em; margin-top:.6rem;">Playfair Display · 700</div>
+                </div>
+                <ul class="pros-cons">
+                  <li class="pro">一眼读成"高端 / 编辑 / 古典"</li>
+                  <li class="pro">高对比 = 大字号冲击力强</li>
+                  <li class="con">小字号脆弱——不要复用到正文</li>
+                  <li class="con">科技品牌用容易显得保守 / 过气</li>
+                </ul>
+              </div>
+              <div class="opt-label"><span class="key">B.</span>Playfair Display</div>
+            </button>
+
+            <button type="button" class="opt opt-rich" data-value="fraunces" data-label="C. Fraunces（个性、柔软）">
+              <div class="opt-preview">
+                <div class="mockup-frame" style="padding:1.4rem 1rem; text-align:center; font-style:normal;">
+                  <div style="font-family:'Fraunces', Georgia, serif; font-size:2.95rem; font-weight:600; color:var(--ink); line-height:1; letter-spacing:-.01em; font-variation-settings:'opsz' 144, 'SOFT' 80, 'WONK' 1;">Aurora</div>
+                  <div style="font-family:var(--sans); font-size:.6rem; color:var(--ink-faded); text-transform:uppercase; letter-spacing:.14em; margin-top:.6rem;">Fraunces · 600 · SOFT 80 · WONK</div>
+                </div>
+                <ul class="pros-cons">
+                  <li class="pro">变量轴（opsz / SOFT / WONK）字符变化范围广</li>
+                  <li class="pro">soft optical 自带温度与个性</li>
+                  <li class="con">个性太强，可能跟其他品牌元素打架</li>
+                  <li class="con">读起来像"2021-22 独立创业品牌潮"</li>
+                </ul>
+              </div>
+              <div class="opt-label"><span class="key">C.</span>Fraunces</div>
+            </button>
+
+            <div class="opt opt-input">
+              <span class="key">D.</span>
+              <input type="text" placeholder="其他 wordmark 衬线…">
+              <button type="button" class="confirm" disabled aria-label="提交">↵</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ─────────── Q4 END ─────────── -->
+
+    <!-- ─────────── Q5 START · PATTERN: 代码片段对比 — 同一套默认渲染，对比不同内容 ───────────
+         Replace card content below. Do not edit past the matching Q5 END marker.
+         Do not touch CSS/JS or the closing </div> structure — only the card content. -->
+    <div class="card" data-id="q5">
+      <button type="button" class="card-header">
+        <span class="qnum">Q5.</span>
+        <span class="title-group">
+          <span class="title-text">对话历史用什么数据结构表示？</span>
+          <span class="selected-label"></span>
+        </span>
+        <span class="chevron"></span>
+      </button>
+      <div class="card-body">
+        <div class="gutter"></div>
+        <div class="content">
+          <p class="q-desc">对话历史以什么形态存储和传给模型——决定 API 设计、token 效率，以及插入 / 编辑 / 分叉单条消息的难易。</p>
+          <p class="rec-hint"><b>扁平的 role/content 数组</b> — OpenAI / Anthropic API 原生格式；工具链成熟；增删改简单；JSON 直接序列化。</p>
+          <div class="options">
+
+            <button type="button" class="opt opt-rich" data-value="flat-array" data-rec="1" data-label="A. 扁平 role/content 数组">
+              <span class="opt-tags"><span class="opt-tag tag-rec">推荐</span></span>
+              <div class="opt-preview">
+                <div class="code-snippet">
+                  <div class="code-head"><span class="code-lang">typescript</span></div>
+<pre><span class="tok-kw">const</span> <span class="tok-id">history</span> = [
+  { role: <span class="tok-str">'user'</span>,      content: <span class="tok-str">'你好'</span> },
+  { role: <span class="tok-str">'assistant'</span>, content: <span class="tok-str">'你好！'</span> },
+  { role: <span class="tok-str">'user'</span>,      content: <span class="tok-str">'帮我调试一下'</span> },
+];</pre>
+                </div>
+                <ul class="pros-cons">
+                  <li class="pro">匹配 OpenAI / Anthropic API 原生格式</li>
+                  <li class="pro">增删改都是简单的数组操作</li>
+                  <li class="pro">JSON 直接序列化、落库零仪式</li>
+                  <li class="con">无法原生表达并行分叉 / 多分支</li>
+                </ul>
+              </div>
+              <div class="opt-label"><span class="key">A.</span>扁平 role/content 数组</div>
+            </button>
+
+            <button type="button" class="opt opt-rich" data-value="nested-thread" data-label="B. 父子树状结构">
+              <div class="opt-preview">
+                <div class="code-snippet">
+                  <div class="code-head"><span class="code-lang">typescript</span></div>
+<pre><span class="tok-kw">const</span> <span class="tok-id">thread</span> = {
+  root: { id: <span class="tok-num">1</span>, role: <span class="tok-str">'user'</span>, content: <span class="tok-str">'你好'</span> },
+  turns: [
+    { id: <span class="tok-num">2</span>, parentId: <span class="tok-num">1</span>, role: <span class="tok-str">'assistant'</span>, content: <span class="tok-str">'你好！'</span> },
+    { id: <span class="tok-num">3</span>, parentId: <span class="tok-num">2</span>, role: <span class="tok-str">'user'</span>, content: <span class="tok-str">'…'</span> },
+  ],
+};</pre>
+                </div>
+                <ul class="pros-cons">
+                  <li class="pro">真实建模对话树——分叉、编辑都很干净</li>
+                  <li class="pro">支持"重新生成"而不丢原版</li>
+                  <li class="con">较重——多数应用过度工程</li>
+                  <li class="con">调 API 前要自定义序列化</li>
+                </ul>
+              </div>
+              <div class="opt-label"><span class="key">B.</span>父子树状结构（thread）</div>
+            </button>
+
+            <button type="button" class="opt opt-rich" data-value="concat-string" data-label="C. 拼接成单段字符串 + 角色标记">
+              <div class="opt-preview">
+                <div class="code-snippet">
+                  <div class="code-head"><span class="code-lang">typescript</span></div>
+<pre><span class="tok-kw">const</span> <span class="tok-id">prompt</span> = <span class="tok-str">`
+[USER] 你好
+[ASSISTANT] 你好！
+[USER] 帮我调试一下
+[ASSISTANT] `</span>;</pre>
+                </div>
+                <ul class="pros-cons">
+                  <li class="pro">最通用——任何 LLM endpoint 都吃得下</li>
+                  <li class="pro">零数据建模复杂度；一条字符串落日志</li>
+                  <li class="con">有损——角色边界混进原文</li>
+                  <li class="con">很难定位 / 编辑 / 删除单条消息</li>
+                </ul>
+              </div>
+              <div class="opt-label"><span class="key">C.</span>拼接成单段字符串 + 角色标记</div>
+            </button>
+
+            <div class="opt opt-input">
+              <span class="key">D.</span>
+              <input type="text" placeholder="其他历史数据结构…">
+              <button type="button" class="confirm" disabled aria-label="提交">↵</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ─────────── Q5 END ─────────── -->
+
+    <!-- ─────────── Q6 START · PATTERN: 纯文本决策 — opt-rich 但 opt-preview 只放 pros/cons ───────────
+         Replace card content below. Do not edit past the matching Q6 END marker.
+         All-or-none rule: NO option in this question has a visual mockup — only pros/cons inside .opt-preview.
+         Do not touch CSS/JS or the closing </div> structure — only the card content. -->
+    <div class="card" data-id="q6">
+      <button type="button" class="card-header">
+        <span class="qnum">Q6.</span>
+        <span class="title-group">
+          <span class="title-text">新建对话时 AI 的"开场白"？</span>
+          <span class="selected-label"></span>
+        </span>
+        <span class="chevron"></span>
+      </button>
+      <div class="card-body">
+        <div class="gutter"></div>
+        <div class="content">
+          <p class="q-desc">用户进入空白对话时第一眼看到什么——决定 AI 的第一印象、用户的引导路径，以及对话的破冰节奏。</p>
+          <p class="rec-hint"><b>静默等待</b> — 不打扰用户思路；空白意味着"AI 准备好了，你说就行"；尤其 power user 不需要引导。</p>
+          <div class="options">
+
+            <button type="button" class="opt opt-rich" data-value="silent" data-rec="1" data-label="A. 静默等待">
+              <span class="opt-tags"><span class="opt-tag tag-rec">推荐</span></span>
+              <div class="opt-preview" style="font-style:normal;">
+                <ul class="pros-cons">
+                  <li class="pro">极简，零打扰；用户掌控开场</li>
+                  <li class="pro">power user / 重度用户最友好</li>
+                  <li class="pro">不限制用户的想象空间</li>
+                  <li class="con">新手缺少引导，可能不知道能问什么</li>
+                </ul>
+              </div>
+              <div class="opt-label"><span class="key">A.</span>静默等待（空白 + 输入框）</div>
+            </button>
+
+            <button type="button" class="opt opt-rich" data-value="greet" data-label="B. 主动问候 + 引导">
+              <div class="opt-preview" style="font-style:normal;">
+                <ul class="pros-cons">
+                  <li class="pro">友好破冰，降低对话启动门槛</li>
+                  <li class="pro">显著塑造 AI 的"人格"温度</li>
+                  <li class="con">显得套路，老用户每次都看略烦</li>
+                  <li class="con">措辞不当容易显得幼稚</li>
+                </ul>
+              </div>
+              <div class="opt-label"><span class="key">B.</span>主动问候 + 引导（"你好，今天有什么我可以帮你？"）</div>
+            </button>
+
+            <button type="button" class="opt opt-rich" data-value="capabilities" data-label="C. 显示能力清单 + 示例 prompt">
+              <div class="opt-preview" style="font-style:normal;">
+                <ul class="pros-cons">
+                  <li class="pro">显式说明 AI 能力，帮新手发现用法</li>
+                  <li class="pro">示例 prompt 可直接点击开始</li>
+                  <li class="con">占据首屏视觉，老用户嫌挤</li>
+                  <li class="con">可能让用户误以为"只能问这些"，限制想象</li>
+                </ul>
+              </div>
+              <div class="opt-label"><span class="key">C.</span>显示能力清单 + 示例 prompt</div>
+            </button>
+
+            <div class="opt opt-input">
+              <span class="key">D.</span>
+              <input type="text" placeholder="其他开场策略…">
+              <button type="button" class="confirm" disabled aria-label="提交">↵</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ─────────── Q6 END ─────────── -->
+
+  </div>
+
+  <div class="done-banner" id="done-banner">
+    <span class="ornament">❧</span>
+    <div class="msg">
+      <strong>决策完毕 — 把答案带回对话</strong>
+      <span>复制下方答案，<b>粘回对话框</b>，继续你的讨论。</span>
+    </div>
+    <button type="button" class="done-cta" id="done-copy-btn">复制答案 →</button>
+  </div>
+
+  <section class="output" id="output">
+    <div class="panel-head">
+      <h3>回答汇总</h3>
+    </div>
+    <div class="body"><textarea id="md-out" spellcheck="false" rows="1"></textarea></div>
+  </section>
+</main>
+
+<div class="warn-row" id="warn-row">
+  <span class="msg" id="warn-msg"></span>
+  <button type="button" class="ghost" id="warn-goto">去补答</button>
+  <button type="button" class="ghost" id="warn-force">仍然复制</button>
+</div>
+
+<div class="summary-bar" id="summary-bar">
+  <div class="progress-track" aria-hidden="true">
+    <div class="progress-fill" id="progress-fill"></div>
+  </div>
+  <div class="summary-row">
+    <span class="summary-label" id="progress">0 / 6</span>
+    <button type="button" class="reset-link" id="reset-md-btn" title="放弃手动修改，重新从选项生成">重置</button>
+    <button type="button" class="copy-link" id="copy-btn">复制</button>
+  </div>
+</div>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/mermaid/10.9.4/mermaid.min.js"></script>
+<script>
+const TOPIC = "AI chat 对话界面";
+const ROUND = 1;
+
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  flowchart: { htmlLabels: false, useMaxWidth: true },
+  themeVariables: {
+    fontFamily: 'ui-sans-serif, -apple-system, sans-serif',
+    fontSize: '13px',
+    primaryColor:       dark ? '#24221C' : '#FAF8F2',
+    primaryTextColor:   dark ? '#FAF4E2' : '#1A1916',
+    primaryBorderColor: dark ? '#DBD4C2' : '#5B5650',
+    lineColor:          dark ? '#DBD4C2' : '#5B5650',
+    secondaryColor:     dark ? '#3D2C24' : '#F5E6DA',
+    tertiaryColor:      dark ? '#08070A' : '#E4DECF',
+    actorBkg:           dark ? '#24221C' : '#FAF8F2',
+    actorBorder:        dark ? '#DBD4C2' : '#5B5650',
+    actorTextColor:     dark ? '#FAF4E2' : '#1A1916',
+    signalColor:        dark ? '#DBD4C2' : '#5B5650',
+    signalTextColor:    dark ? '#FAF4E2' : '#1A1916',
+  }
+});
+
+const cards = [...document.querySelectorAll('#questions .card')];
+
+// Lazy mermaid render — collapsed cards have 0 width so mermaid renders at micro-scale.
+// Render each card's diagrams the first time it opens.
+const ensureMermaid = (card) => {
+  const fresh = card.querySelectorAll('pre.mermaid:not([data-processed])');
+  if (!fresh.length) return;
+  mermaid.run({ nodes: [...fresh] }).catch(err => {
+    console.error('Mermaid:', err);
+    fresh.forEach(el => {
+      if (!el.dataset.failed) {
+        el.dataset.failed = '1';
+        el.textContent = '[diagram failed to render — see console]';
+      }
+    });
+  });
+};
+// Boot — only Q1 is open initially.
+const firstOpen = cards.find(c => c.dataset.open === '1');
+if (firstOpen) ensureMermaid(firstOpen);
+
+const answers = {};
+const mdOut = document.getElementById('md-out');
+const progress = document.getElementById('progress');
+const progressFill = document.getElementById('progress-fill');
+const copyBtn = document.getElementById('copy-btn');
+const warnRow = document.getElementById('warn-row');
+const warnMsg = document.getElementById('warn-msg');
+const hideWarn = () => warnRow.dataset.show = '0';
+
+const updateOutput = () => {
+  const total = cards.length;
+  const answered = Object.values(answers).filter(a => a && (a.value || a.custom)).length;
+  progress.textContent = answered === total ? `✓ 完成` : `${answered} / ${total}`;
+  progressFill.style.setProperty('width', total > 0 ? `${(answered / total) * 100}%` : '0%', 'important');
+  document.body.dataset.allDone = answered === total ? '1' : '0';
+
+  // Markdown output — 全中文
+  const lines = [`## Grill 回答 · 第 ${ROUND} 轮 · ${TOPIC}`, ''];
+  for (const card of cards) {
+    const id = card.dataset.id;
+    const q = card.querySelector('.card-header .title-text')?.textContent.trim() || id;
+    const a = answers[id];
+    lines.push(`**${q}**`);
+    if (a) {
+      if (a.custom) {
+        lines.push(`- 自填: ${a.custom}`);
+      } else {
+        const tag = a.recommended ? '（推荐）' : '';
+        lines.push(`- 选择: \`${a.value}\` — ${a.label}${tag}`);
+      }
+    } else {
+      lines.push(`- _(未回答)_`);
+    }
+    lines.push('');
+  }
+  // Don't clobber manual edits — once user types in the textarea,
+  // they own its contents until they hit 重置.
+  if (mdOut.dataset.dirty !== '1') {
+    mdOut.value = lines.join('\n');
+  }
+  autoGrow();
+};
+
+// Textarea grows with content — no internal scroll, rely on page scroll.
+const autoGrow = () => {
+  mdOut.style.height = 'auto';
+  mdOut.style.height = mdOut.scrollHeight + 'px';
+};
+
+mdOut.addEventListener('input', () => {
+  mdOut.dataset.dirty = '1';
+  document.body.dataset.mdDirty = '1';
+  autoGrow();
+});
+
+document.getElementById('reset-md-btn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  mdOut.dataset.dirty = '0';
+  document.body.dataset.mdDirty = '0';
+  updateOutput();
+});
+
+const unansweredCards = () => cards.filter(c => !answers[c.dataset.id]);
+
+const advanceFrom = (currentCard, justAnswered) => {
+  if (!justAnswered) return;
+  currentCard.dataset.open = '0';
+  // Forward-only: jump to next unanswered AFTER current card; skipped earlier ones
+  // stay skipped (user intent). The copy-button warn will catch any leftovers.
+  const currentIdx = cards.indexOf(currentCard);
+  const next = cards.slice(currentIdx + 1).find(c => !answers[c.dataset.id]);
+  if (next) {
+    next.dataset.open = '1';
+    ensureMermaid(next);
+    // Force layout reflow, then scroll sync to absolute position of next card's header.
+    void next.offsetHeight;
+    const headerRect = next.querySelector('.card-header').getBoundingClientRect();
+    window.scrollTo(0, window.scrollY + headerRect.top - 32);
+  } else if (!cards.some(c => !answers[c.dataset.id])) {
+    // Truly all done (no skipped) — scroll to the done banner
+    document.getElementById('done-banner').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  // else: forward done but some earlier intentionally skipped — stay put, no auto-action
+};
+
+const clearSelections = (card) => {
+  card.querySelectorAll('.options [data-selected="1"]').forEach(el => el.removeAttribute('data-selected'));
+};
+
+const updateSelectedLabel = (card) => {
+  const id = card.dataset.id;
+  const a = answers[id];
+  const slot = card.querySelector('.selected-label');
+  if (!slot) return;
+  if (!a) { slot.textContent = ''; return; }
+  slot.textContent = a.custom ? a.custom : a.label;
+};
+
+const selectOption = (card, optBtn) => {
+  const id = card.dataset.id;
+  const wasFirst = !answers[id];
+  clearSelections(card);
+  optBtn.dataset.selected = '1';
+  answers[id] = {
+    value: optBtn.dataset.value,
+    label: optBtn.dataset.label || optBtn.textContent.trim(),
+    recommended: optBtn.dataset.rec === '1',
+  };
+  card.dataset.answered = '1';
+  updateSelectedLabel(card);
+  hideWarn();
+  updateOutput();
+  advanceFrom(card, wasFirst);
+};
+
+const submitCustom = (card, text) => {
+  if (!text) return;
+  const id = card.dataset.id;
+  const wasFirst = !answers[id];
+  clearSelections(card);
+  const inputRow = card.querySelector('.opt-input');
+  if (inputRow) inputRow.dataset.selected = '1';
+  answers[id] = { custom: text };
+  card.dataset.answered = '1';
+  updateSelectedLabel(card);
+  hideWarn();
+  updateOutput();
+  advanceFrom(card, wasFirst);
+};
+
+for (const card of cards) {
+  card.querySelector('.card-header').addEventListener('click', () => {
+    card.dataset.open = card.dataset.open === '1' ? '0' : '1';
+    if (card.dataset.open === '1') ensureMermaid(card);
+  });
+
+  card.querySelectorAll('button.opt').forEach(btn => {
+    btn.addEventListener('click', () => selectOption(card, btn));
+  });
+
+  const inputRow = card.querySelector('.opt-input');
+  if (inputRow) {
+    const input = inputRow.querySelector('input');
+    const confirm = inputRow.querySelector('.confirm');
+    input.addEventListener('input', () => {
+      confirm.disabled = input.value.trim().length === 0;
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        if (!confirm.disabled) submitCustom(card, input.value.trim());
+      }
+    });
+    confirm.addEventListener('click', () => {
+      if (!confirm.disabled) submitCustom(card, input.value.trim());
+    });
+  }
+}
+
+const doneCopyBtn = document.getElementById('done-copy-btn');
+// Fallback for non-secure contexts (HTTP LAN). Uses <span> + Selection API:
+// no focus (no keyboard pop on mobile), no readonly (iOS Safari refuses
+// copy from readonly textareas), no opacity:0 (iOS Safari silently returns
+// true but copies nothing when the source is opacity:0 / display:none).
+const fallbackCopy = (text) => {
+  const span = document.createElement('span');
+  span.textContent = text;
+  span.style.cssText = 'position:fixed;top:-9999px;left:0;white-space:pre;-webkit-user-select:text;user-select:text;';
+  document.body.appendChild(span);
+  const range = document.createRange();
+  range.selectNodeContents(span);
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(range);
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+  sel.removeAllRanges();
+  document.body.removeChild(span);
+  return ok;
+};
+
+const doCopy = async () => {
+  const text = mdOut.value;
+  let ok = false;
+  if (navigator.clipboard && window.isSecureContext) {
+    try { await navigator.clipboard.writeText(text); ok = true; } catch (e) { ok = false; }
+  }
+  if (!ok) {
+    ok = fallbackCopy(text);
+  }
+  if (!ok) {
+    copyBtn.textContent = '失败 · 请手动 ⌘C';
+    copyBtn.dataset.failed = '1';
+    setTimeout(() => { copyBtn.textContent = '复制'; delete copyBtn.dataset.failed; }, 3500);
+    return;
+  }
+  copyBtn.textContent = '已复制';
+  copyBtn.dataset.copied = '1';
+  if (doneCopyBtn) {
+    doneCopyBtn.textContent = '✓ 已复制 — 现在去粘回对话框';
+    doneCopyBtn.dataset.copied = '1';
+  }
+  setTimeout(() => {
+    copyBtn.textContent = '复制';
+    delete copyBtn.dataset.copied;
+    if (doneCopyBtn) {
+      doneCopyBtn.textContent = '复制答案 →';
+      delete doneCopyBtn.dataset.copied;
+    }
+  }, 3000);
+};
+doneCopyBtn?.addEventListener('click', () => doCopy());
+
+copyBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  const missing = unansweredCards();
+  if (missing.length === 0) { doCopy(); return; }
+  const labels = missing.map(c => c.querySelector('.qnum').textContent.replace('.', '')).join('、');
+  warnMsg.replaceChildren(
+    Object.assign(document.createElement('b'), { textContent: labels }),
+    document.createTextNode(' 还没回答，仍要复制吗？'),
+  );
+  warnRow.dataset.show = '1';
+});
+
+document.getElementById('warn-goto').addEventListener('click', () => {
+  hideWarn();
+  const first = unansweredCards()[0];
+  if (first) {
+    first.dataset.open = '1';
+    ensureMermaid(first);
+    void first.offsetHeight;
+    const headerRect = first.querySelector('.card-header').getBoundingClientRect();
+    window.scrollTo(0, window.scrollY + headerRect.top - 32);
+    first.querySelector('.opt, input')?.focus();
+  }
+});
+document.getElementById('warn-force').addEventListener('click', () => {
+  hideWarn();
+  doCopy();
+});
+
+updateOutput();
+</script>
+
+</body>
+</html>
