@@ -1,15 +1,13 @@
 # grill-me-visual
 
-[中文 →](./README.zh-CN.md)
+<p align="center"><strong>English</strong> · <a href="./README.zh-CN.md">中文</a></p>
 
 > Visual design decisions you can see — pick from rendered options in your browser instead of describing them in chat.
-
-[▸ Try the live demo](https://akiyax.github.io/skills/grill-me-visual/template.en.html)
 
 <table>
 <tr>
 <th width="50%" align="left"><code>grill-me</code> — in chat</th>
-<th width="50%" align="left"><code>grill-me-visual</code> — in browser</th>
+<th width="50%" align="left"><code>grill-me-visual</code> — in browser &nbsp; <a href="https://akiyax.github.io/skills/grill-me-visual/template.en.html">🚀 Try Now</a></th>
 </tr>
 <tr>
 <td valign="top">

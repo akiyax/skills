@@ -1,15 +1,13 @@
 # grill-me-visual
 
-[English →](./README.md)
+<p align="center"><a href="./README.md">English</a> · <strong>中文</strong></p>
 
 > 用看的来做视觉设计决策——在浏览器里从渲染好的选项里挑,而不是在聊天里干描述。
-
-[▸ 打开 live demo](https://akiyax.github.io/skills/grill-me-visual/template.zh.html)
 
 <table>
 <tr>
 <th width="50%" align="left"><code>grill-me</code> — 聊天里</th>
-<th width="50%" align="left"><code>grill-me-visual</code> — 浏览器里</th>
+<th width="50%" align="left"><code>grill-me-visual</code> — 浏览器里 &nbsp; <a href="https://akiyax.github.io/skills/grill-me-visual/template.zh.html">🚀 试一试</a></th>
 </tr>
 <tr>
 <td valign="top">
