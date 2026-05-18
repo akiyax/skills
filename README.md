@@ -2,7 +2,10 @@
 
 <p align="center"><strong>English</strong> · <a href="./README.zh-CN.md">中文</a></p>
 
-> Let your agent grill you in HTML.
+> *"No-one knows exactly what they want."*  
+> — Thomas & Hunt, *The Pragmatic Programmer*
+>
+> Especially before they've seen it.
 
 <table>
 <tr>

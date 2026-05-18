@@ -2,7 +2,10 @@
 
 <p align="center"><a href="./README.md">English</a> · <strong>中文</strong></p>
 
-> 做决策的前提是你能看懂问题，让 Agent 使用可视化的形式向你提问。
+> *"没人确切知道自己想要什么。"*  
+> — Thomas & Hunt,《程序员修炼之道》
+>
+> 尤其在看见之前。
 
 <table>
 <tr>
