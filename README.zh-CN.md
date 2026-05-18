@@ -6,7 +6,7 @@
 
 [▸ 打开 live demo](https://akiyax.github.io/skills/grill-me-visual/template.zh.html)
 
-![grill-me-visual hero](.assets/grill-me-visual/screenshot.zh.png)
+<img src=".assets/grill-me-visual/screenshot.zh.png" alt="grill-me-visual hero" width="400">
 
 ## 这玩意儿干啥的
 

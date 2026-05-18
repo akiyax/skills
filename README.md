@@ -6,7 +6,7 @@
 
 [▸ Try the live demo](https://akiyax.github.io/skills/grill-me-visual/template.en.html)
 
-![grill-me-visual hero](.assets/grill-me-visual/screenshot.en.png)
+<img src=".assets/grill-me-visual/screenshot.en.png" alt="grill-me-visual hero" width="400">
 
 ## What this does
 
