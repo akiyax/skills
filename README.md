@@ -19,22 +19,10 @@
 How assistant replies appear on screen — sets the overall "conversation" vs "document" feel, and shapes long-reply readability, information density, and scroll rhythm.
 
 **A. Document style** — *recommended*
-- ✓ Long replies read comfortably — line width can reach 70+ chars
-- ✓ Code, tables, long markdown aren't squashed by bubble width
-- ✓ Clean visual, high information density
-- ✗ Lacks strong "conversation" feel — newcomers may find it cold
 
 **B. Bubble style**
-- ✓ Strong conversational feel — matches IM user habits
-- ✓ User / assistant visual boundary is sharp
-- ✗ Bubble width compresses long content and code blocks
-- ✗ Bad fit for dense information (tables, markdown)
 
 **C. Card style**
-- ✓ Sharpest boundary per message
-- ✓ Fits when each message needs actions (copy / share / rate)
-- ✗ Visually heavy — attention gets fragmented
-- ✗ Visual noise accumulates over long conversations
 
 *Recommended:* **Document style** — long replies read comfortably; density is high; unless you're building an IM-style social product (Discord, Slack), don't force bubbles.
 
