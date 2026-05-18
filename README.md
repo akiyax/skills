@@ -6,7 +6,33 @@
 
 [▸ Try the live demo](https://akiyax.github.io/skills/grill-me-visual/template.en.html)
 
-<img src=".assets/grill-me-visual/screenshot.en.png" alt="grill-me-visual hero" width="400">
+<table>
+<tr>
+<td width="50%" valign="top">
+
+**`grill-me`** — in chat:
+
+> **Q.** How should assistant replies be laid out?
+>
+> **A. Document style** *(recommended)*
+> Long replies read comfortably; density high.
+>
+> **B. Bubble style**
+> IM-style speech bubbles.
+>
+> **C. Card style**
+> Each message in a bordered card.
+
+</td>
+<td width="50%" valign="top">
+
+**`grill-me-visual`** — in browser:
+
+<img src=".assets/grill-me-visual/screenshot.en.png" alt="grill-me-visual" width="100%">
+
+</td>
+</tr>
+</table>
 
 ## What this does
 

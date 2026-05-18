@@ -6,7 +6,33 @@
 
 [▸ 打开 live demo](https://akiyax.github.io/skills/grill-me-visual/template.zh.html)
 
-<img src=".assets/grill-me-visual/screenshot.zh.png" alt="grill-me-visual hero" width="400">
+<table>
+<tr>
+<td width="50%" valign="top">
+
+**`grill-me`** — 聊天里:
+
+> **Q.** 回复消息的整体排版语言?
+>
+> **A. Document 文档风** *(推荐)*
+> 长回复阅读舒适、信息密度高。
+>
+> **B. Bubble 聊天风**
+> IM 风格气泡。
+>
+> **C. Card 卡片风**
+> 每条消息一个边框卡片。
+
+</td>
+<td width="50%" valign="top">
+
+**`grill-me-visual`** — 浏览器里:
+
+<img src=".assets/grill-me-visual/screenshot.zh.png" alt="grill-me-visual" width="100%">
+
+</td>
+</tr>
+</table>
 
 ## 这玩意儿干啥的
 
