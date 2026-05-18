@@ -2,7 +2,7 @@
 
 <p align="center"><a href="./README.md">English</a> · <strong>中文</strong></p>
 
-> 用看的来做视觉设计决策——在浏览器里从渲染好的选项里挑,而不是在聊天里干描述。
+> 让 Agent 使用 HTML 向你提问。
 
 <table>
 <tr>
@@ -33,24 +33,33 @@
 </tr>
 </table>
 
-## 这玩意儿干啥的
-
-有些设计决策在文字里讲不清。*"bubble 还是 document 排版?"、"指数退避还是降级备用?"、"wordmark 用 Source Serif 还是 Playfair?"* —— 你能在聊天里把选项描述出来,但只有把它们并排放在一起看,你才真的知道想要哪个。
-
-`grill-me-visual` 是个 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill,在 Claude 准备一口气问你 3+ 个视觉决策时触发。它不在聊天里问,而是**生成一个单文件 HTML 问卷** —— 用任何浏览器打开,每题选项并排预览(UI mockup / CSS 动画 / Mermaid 图 / 字体样本 / 代码片段),推荐项有标记,点选完点 Copy,把 markdown 总结贴回聊天。零构建、零安装,就一个文件。
-
 ## 安装
 
 ```bash
 npx skills add akiyax/skills --skill grill-me-visual -g -y
 ```
 
-自带英文和中文模板 —— Claude 按你在聊天里用的语言自动挑。
+## 介绍
 
-## 背景
+[`grill-me`](https://github.com/mattpocock/skills/blob/main/skills/productivity/grill-me/SKILL.md) 是一个极佳的 skill。但是，如果你在使用 [`grill-me`](https://github.com/mattpocock/skills/blob/main/skills/productivity/grill-me/SKILL.md) 或者  [`brainstorm`](https://github.com/obra/superpowers/blob/main/skills/brainstorming/SKILL.md)，你可能会遇到：
 
-灵感来自 [`mattpocock/skills` 的 `grill-me`](https://github.com/mattpocock/skills) —— 同一种"穷追不舍"的 grilling 哲学,只是面向那些 3 句文字问题撑不起来、要 3 张缩略图才说得清的视觉决策。
+- 不知道Agent问的问题是什么意思
+- 每个选项代表的含义也不清楚
 
-## License
+特别是在UI/UX设计、流程或架构决策时，纯文本或ASCII图表的表现力明显不足。所以为什么不把问题放到HTML 中呢？
 
-MIT
+`grill-me-visual` 附带了 HTML 模板，并内置了 6 种问题类型
+
+- **UI布局** —— 内联 HTML/CSS 的布局 / 容器 / 渲染样式对比
+- **动画** —— `@keyframes` 实时动效演示
+- **Mermaid** —— 流程图 / 时序图 / 状态图 / ER 图 / 类图
+- **字体** —— 字体样本对比
+- **代码** —— 同样渲染,不同内容
+- **纯文本** —— 无需视觉决策的问题
+
+你的Agent会先输出问题内容，然后为每个问题挑选模板，并创建一个HTML让你在浏览器中进行决策。
+
+回答完毕后，你可以将所有问答粘贴回对话中继续讨论。
+
+> [!WARNING]
+> **这不是一个轻量 skill。** 尽管已经做了大量节约 token 的工作，agent 通常仍然需要几分钟才能创建完 HTML 文件。使用前请权衡这些决策是否值得时间/Token用量。

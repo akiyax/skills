@@ -2,7 +2,7 @@
 
 <p align="center"><strong>English</strong> · <a href="./README.zh-CN.md">中文</a></p>
 
-> Visual design decisions you can see — pick from rendered options in your browser instead of describing them in chat.
+> Let your agent grill you in HTML.
 
 <table>
 <tr>
@@ -33,24 +33,33 @@ How assistant replies appear on screen — sets the overall "conversation" vs "d
 </tr>
 </table>
 
-## What this does
-
-Some design decisions are awkward to make in text. *"Bubble vs document layout?", "exponential backoff or fallback model?", "Source Serif or Playfair for the wordmark?"* — you can describe the options in words, but you don't really know which one you want until you see them side by side.
-
-`grill-me-visual` is a [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill that fires when Claude is about to ask you 3+ visually-shaped questions in a row. Instead of asking them in chat, it generates a **single-file HTML questionnaire** — opens in any browser, side-by-side previews per question (UI mockups, CSS animations, Mermaid diagrams, font samples, code snippets), recommended option marked, click to pick, copy the markdown summary back into chat. No build, no install, just one file.
-
 ## Install
 
 ```bash
 npx skills add akiyax/skills --skill grill-me-visual -g -y
 ```
 
-Ships with English and Chinese templates — Claude picks the one matching the language you're chatting in.
+## About
 
-## Background
+[`grill-me`](https://github.com/mattpocock/skills/blob/main/skills/productivity/grill-me/SKILL.md) is a great skill. But if you're using [`grill-me`](https://github.com/mattpocock/skills/blob/main/skills/productivity/grill-me/SKILL.md) or [`brainstorm`](https://github.com/obra/superpowers/blob/main/skills/brainstorming/SKILL.md), you might run into:
 
-Inspired by [`mattpocock/skills` — `grill-me`](https://github.com/mattpocock/skills) — same relentless-grilling philosophy, but for the subset of decisions where a 3-sentence text question doesn't carry the weight of three thumbnails.
+- You can't tell what the agent is actually asking
+- You can't tell what each option really means
 
-## License
+This is especially true for UI/UX design, process, or architecture decisions — plain text and ASCII diagrams aren't expressive enough. So why not put the questions in HTML?
 
-MIT
+`grill-me-visual` ships with HTML templates and 6 built-in question types:
+
+- **UI Layout** — layout / container / render-style comparison via inline HTML/CSS
+- **Animation** — live `@keyframes` motion demo
+- **Mermaid** — flowchart / sequence / state / ER / class diagrams
+- **Font** — typography sample comparison
+- **Code** — same default rendering, different content
+- **Text-only** — fallback for decisions with no visual angle
+
+Your agent writes the question content first, then picks a template per question and creates an HTML file for you to decide in the browser.
+
+When you're done, paste the Q&A summary back into chat to continue.
+
+> [!WARNING]
+> **Not a lightweight skill.** Despite token-saving measures, the agent still typically takes a few minutes to assemble the HTML file. Weigh whether the decisions are worth the time/token cost before invoking.
