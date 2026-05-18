@@ -7,9 +7,9 @@
 <meta name="theme-color" content="#100F0B" media="(prefers-color-scheme: dark)">
 <title>Grill · AI chat 对话界面</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.cn">
-<link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin>
-<link href="https://fonts.googleapis.cn/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,500;1,8..60,600&family=Manrope:wght@400;500;600&family=Playfair+Display:wght@400;600;700;900&family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..700,0..100,0..1&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,500;1,8..60,600&family=Manrope:wght@400;500;600&family=Playfair+Display:wght@400;600;700;900&family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..700,0..100,0..1&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
   :root {
@@ -1610,14 +1610,13 @@ flowchart TD
   </div>
 </div>
 
-<script src="https://cdn.bootcdn.net/ajax/libs/mermaid/10.9.4/mermaid.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.4/dist/mermaid.min.js"></script>
 <script>
 const TOPIC = "AI chat 对话界面";
 const ROUND = 1;
 
-// 所有面向用户的字符串。语言模板之间唯一应该不同的是这个 LANG 对象 +
-// <head> 里的 CDN URL（Google Fonts + Mermaid）。本 <script> 的其余部分
-// 必须在所有语言模板之间保持逐字节一致。
+// 所有面向用户的字符串。语言模板之间唯一应该不同的就是这个 LANG 对象。
+// 本 <script> 的其余部分必须在所有语言模板之间保持逐字节一致。
 const LANG = {
   progressDone:   '✓ 完成',
   mdHeading:      (round, topic) => `## Grill 回答 · 第 ${round} 轮 · ${topic}`,

@@ -205,11 +205,10 @@ For genuinely open-ended questions where some options have "no UI" (e.g. silent 
 
 ## Translating to a third language
 
-The two shipped templates are kept structurally identical — their `<script>` bodies are byte-identical after the `LANG` object — and differ in exactly three places:
+The two shipped templates are kept structurally identical — their `<script>` bodies are byte-identical after the `LANG` object — and differ in exactly two places:
 
 1. **The `LANG = { ... }` object** at the top of `<script>` — all strings that JS emits dynamically (markdown output, button states, warning text, the `Recommended` tag label).
 2. **Inline HTML chrome strings** — masthead eyebrow / topic, lede, output-panel title, button labels (Copy / Reset / warn-row goto+force), done-banner title + CTA, the `tag-current` label, every demo card's body.
-3. **`<head>` CDN URLs** — Google Fonts and Mermaid. Use China-accessible mirrors (`fonts.googleapis.cn`, `cdn.bootcdn.net`) when the audience is in China.
 
-To add a new language: copy whichever template is closest, swap (1)+(2)+(3), and `diff` the JS body against the original to confirm nothing else drifted. Run `diff <(awk '/^const dark = matchMedia/,/^<\/script>/' template.en.html) <(awk '/^const dark = matchMedia/,/^<\/script>/' template.NEW.html)` — it must be empty.
+To add a new language: copy whichever template is closest, swap (1)+(2), and `diff` the JS body against the original to confirm nothing else drifted. Run `diff <(awk '/^const dark = matchMedia/,/^<\/script>/' template.en.html) <(awk '/^const dark = matchMedia/,/^<\/script>/' template.NEW.html)` — it must be empty.
 
