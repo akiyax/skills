@@ -7,7 +7,7 @@
 <table>
 <tr>
 <th width="50%" align="left"><code>grill-me</code> — in chat</th>
-<th width="50%" align="left"><code>grill-me-visual</code> — in browser &nbsp; <a href="https://akiyax.github.io/skills/grill-me-visual/template.en.html">🚀 Try Now</a></th>
+<th width="50%" align="left"><code>grill-me-visual</code> — in browser &nbsp; <a href="https://akiyax.github.io/skills/skills/grill-me-visual/template.en.html">🚀 Try Now</a></th>
 </tr>
 <tr>
 <td valign="top">
@@ -35,9 +35,21 @@ How assistant replies appear on screen — sets the overall "conversation" vs "d
 
 ## Install
 
+**A. skills CLI** *(recommended)*
+
+Auto-detects which agent you're running (Claude Code, Cursor, Codex, Gemini CLI, OpenCode, etc.) and installs to the right location.
+
 ```bash
 npx skills add akiyax/skills --skill grill-me-visual -g -y
 ```
+
+**B. Claude Code plugin marketplace**
+
+```
+/plugin marketplace add akiyax/skills
+/plugin install grill-me-visual@akiyax-skills
+```
+
 
 ## About
 

@@ -1,0 +1,16 @@
+{
+  "name": "akiyax-skills",
+  "owner": {
+    "name": "akiyax"
+  },
+  "metadata": {
+    "description": "Agent skills by akiyax.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "grill-me-visual",
+      "source": "./"
+    }
+  ]
+}

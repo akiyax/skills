@@ -1,0 +1,8 @@
+{
+  "name": "grill-me-visual",
+  "version": "0.1.0",
+  "description": "Generate a single-file HTML questionnaire with side-by-side rendered previews so your agent can grill you on visual / layout / motion / typography / diagram-shaped decisions in the browser instead of in chat.",
+  "author": {
+    "name": "akiyax"
+  }
+}

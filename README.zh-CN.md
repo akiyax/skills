@@ -2,12 +2,12 @@
 
 <p align="center"><a href="./README.md">English</a> · <strong>中文</strong></p>
 
-> 让 Agent 使用 HTML 向你提问。
+> 做决策的前提是你能看懂问题，让 Agent 使用可视化的形式向你提问。
 
 <table>
 <tr>
 <th width="50%" align="left"><code>grill-me</code> — 对话框中 </th>
-<th width="50%" align="left"><code>grill-me-visual</code> — 浏览器中 &nbsp; <a href="https://akiyax.github.io/skills/grill-me-visual/template.zh.html">🚀 试一试</a></th>
+<th width="50%" align="left"><code>grill-me-visual</code> — 浏览器中 &nbsp; <a href="https://akiyax.github.io/skills/skills/grill-me-visual/template.zh.html">🚀 试一试</a></th>
 </tr>
 <tr>
 <td valign="top">
@@ -35,9 +35,21 @@
 
 ## 安装
 
+**A. skills CLI**(推荐)
+
+自动识别你正在用的 agent(Claude Code / Cursor / Codex / Gemini CLI / OpenCode 等)并安装到对应位置。
+
 ```bash
 npx skills add akiyax/skills --skill grill-me-visual -g -y
 ```
+
+**B. Claude Code plugin marketplace**
+
+```
+/plugin marketplace add akiyax/skills
+/plugin install grill-me-visual@akiyax-skills
+```
+
 
 ## 介绍
 
