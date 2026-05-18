@@ -8,25 +8,38 @@
 
 <table>
 <tr>
-<td width="50%" valign="top">
+<th width="50%" align="left"><code>grill-me</code> — 聊天里</th>
+<th width="50%" align="left"><code>grill-me-visual</code> — 浏览器里</th>
+</tr>
+<tr>
+<td valign="top">
 
-**`grill-me`** — 聊天里:
+**Q.** 回复消息的整体排版语言?
 
-> **Q.** 回复消息的整体排版语言?
->
-> **A. Document 文档风** *(推荐)*
-> 长回复阅读舒适、信息密度高。
->
-> **B. Bubble 聊天风**
-> IM 风格气泡。
->
-> **C. Card 卡片风**
-> 每条消息一个边框卡片。
+助手的回复怎么呈现给用户——决定整体的"对话感"vs"文档感",影响长回复的阅读舒适度、信息密度、滚动节奏。
+
+**A. Document 文档风** — *推荐*
+- ✓ 长回复阅读舒适,行宽可达 70+ 字符
+- ✓ 代码、表格、长 markdown 不被气泡限宽挤压
+- ✓ 视觉简洁,信息密度高
+- ✗ 缺少强烈的"对话感",新手可能觉得冷
+
+**B. Bubble 聊天风**
+- ✓ 强对话感,符合 IM 用户习惯
+- ✓ 用户/助手视觉边界清晰
+- ✗ 气泡限宽,长内容/代码块被压缩
+- ✗ 不适合密集信息(表格、markdown)
+
+**C. Card 卡片风**
+- ✓ 每条消息边界最清晰
+- ✓ 适合需要对每条消息操作(复制/分享/打分)
+- ✗ 视觉重,注意力被切割
+- ✗ 长对话时累计视觉噪音大
+
+*推荐:* **Document 文档风** — 长回复阅读舒适、信息密度高;除非专做对话社交产品(IM、Discord 类),别强加 bubble。
 
 </td>
-<td width="50%" valign="top">
-
-**`grill-me-visual`** — 浏览器里:
+<td valign="top">
 
 <img src=".assets/grill-me-visual/screenshot.zh.png" alt="grill-me-visual" width="100%">
 
