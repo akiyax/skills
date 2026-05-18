@@ -54,13 +54,15 @@ The template is a single HTML file (~1900 lines, ~75 KB, roughly 20–25k tokens
 **Do not rewrite the template** — copy it and edit only the question content.
 
 ```
-1. Bash:  mkdir -p .claude/grill-me-visual && cp <skill-dir>/template.<en|zh>.html <output-path>
+1. Bash:  mkdir -p .grill-me-visual && cp <skill-dir>/template.<en|zh>.html <output-path>
           # <skill-dir> = the directory this SKILL.md lives in. Resolve from the
           # path the harness gave you when loading the skill.
-          # <output-path> = .claude/grill-me-visual/grill-{topic-slug}-round-{N}.html
-          # — project-local under the .claude/ convention. Decisions belong to
-          # the project they're about; multi-round files cluster together; the
-          # user can commit them or gitignore them at their own discretion.
+          # <output-path> = .grill-me-visual/grill-{topic-slug}-round-{N}.html
+          # — hidden top-level folder in the user's CWD (dot prefix keeps it out
+          # of `ls` output and avoids colliding with the skill's own source dir
+          # when running inside this repo). Decisions belong to the project
+          # they're about; multi-round files cluster together; the user can
+          # commit them or gitignore them at their own discretion.
           # Use a relative path with forward slashes so it works cross-platform
           # (macOS, Linux, WSL, Git Bash, PowerShell, cmd). Avoid `/tmp`
           # (missing on native Windows) and `mktemp -t ...` (semantics differ
@@ -109,8 +111,8 @@ Each card replaces the block between `<!-- Qn START -->` and `<!-- Qn END -->`. 
 - `<span class="qnum">Qn.</span>` and `<span class="title-text">` in `.card-header`
 - `<p class="q-desc">` — what / why (Setting → impact). No option preview here.
 - `<p class="rec-hint"><b>{name}</b> — {one-line why}</p>` — recommendation reasoning
-- 3 `<button class="opt opt-rich" data-value="slug" [data-rec="1"] data-label="A. …">` options with `.opt-preview` + `.pros-cons` + `.opt-label`
-- 1 `<div class="opt opt-input">` for free-text "Other…" (always last)
+- N `<button class="opt opt-rich" data-value="slug" [data-rec="1"] data-label="A. …">` preset options with `.opt-preview` + `.pros-cons` + `.opt-label`. Letters A, B, C, … sequential; exactly one option has `data-rec="1"`. Use as many as the decision genuinely has — if you can't find 2, ask in chat instead; if you'd need 5+, consider splitting into two questions.
+- 1 `<div class="opt opt-input">` for free-text "Other…" — always last, letter following the last preset.
 
 Tags: set `<span class="opt-tags"><span class="opt-tag tag-current">Current</span></span>` on the option the user is using today (if any). The `Recommended` tag is auto-injected from `data-rec="1"` — don't add it by hand. To translate the recommended label, edit `LANG.tagRec` only.
 
