@@ -31,8 +31,8 @@ For other languages, copy the closest fit (probably `template.en.html`) and tran
 ## Workflow per round
 
 1. **Identify the topic** — what design space are we exploring this round? (e.g. "AI chat interface", "marketing landing page", "dashboard information hierarchy", "Slack-bot message styling")
-2. **Choose 4–6 questions** — each must be a real decision with genuine stakes. No filler / "what's your favorite color" questions.
-3. **Pick a preview pattern per question** (see pattern catalog below). See Content rules for the all-or-none rule.
+2. **Output the question list to chat — before opening the template.** Include only decisions where the user could plausibly pick any option. Reading the template first will anchor you into filler questions and forced patterns.
+3. **Pick a preview pattern per question** (see pattern catalog below). Pattern reuse is fine — a layout-heavy round may use UI mockup 3–4× in a row. If a question has no genuine visual angle, switch it to text-only (pattern #6) or ask it in chat.
 4. **Create + smoke-test the HTML file** by copying the right template (see authoring flow below).
 5. **Hand the file path to the user** and wait for their answers.
 6. **When they paste the markdown summary back**, parse the answers. Drill until every visually-shaped decision is resolved — don't stop at one round just because the user answered everything:
@@ -47,8 +47,8 @@ For other languages, copy the closest fit (probably `template.en.html`) and tran
 
 The template is a single HTML file (~1900 lines, ~75 KB, roughly 20–25k tokens — **larger than the default Read window**). Don't slurp the whole file. Use these patterns:
 
-- `Bash grep -n "Qn START"` to locate a card's line number, then `Read` with `offset` + `limit` (~80 lines per card)
-- The `<!-- Qn START · PATTERN: ... -->` comment header tells you what preview pattern each demo card uses — match yours to one of them
+- `Bash grep -n "PATTERN:"` lists what pattern each demo card uses. Delete the cards for patterns you don't need (whole `<!-- QN START -->`…`<!-- QN END -->` block) sight-unseen — no Read.
+- For the survivors, `grep -n "Qn START"` to locate, then `Read` with `offset` + `limit` (~80 lines per card)
 - Each card is fully self-contained between its START and END markers; you can `Edit` that block in one call without reading the rest of the file
 
 **Do not rewrite the template** — copy it and edit only the question content.
@@ -65,22 +65,27 @@ The template is a single HTML file (~1900 lines, ~75 KB, roughly 20–25k tokens
           # (macOS, Linux, WSL, Git Bash, PowerShell, cmd). Avoid `/tmp`
           # (missing on native Windows) and `mktemp -t ...` (semantics differ
           # between macOS and Linux).
-2. Edit:  replace `const TOPIC = "..."` with this round's topic
-3. Edit:  replace `const ROUND = ...` if this is round N > 1
-4. Edit:  replace masthead `<span class="topic">...</span>` text to match TOPIC
-5. Edit:  replace the `<p class="lede">...</p>` with a roadmap-style POV sentence
-6. Edit × N cards:  replace each card body between its
+2. Bash:  grep -n "PATTERN:" <file>  # which Qn uses which pattern
+          Delete whole QN blocks for any pattern you're NOT using (markers and
+          all) — no Read needed. Renumber survivors' `data-id` sequential q1…qN.
+3. Edit:  replace `const TOPIC = "..."` with this round's topic
+4. Edit:  replace `const ROUND = ...` if this is round N > 1
+5. Edit:  replace masthead `<span class="topic">...</span>` text to match TOPIC
+6. Edit:  replace the `<p class="lede">...</p>` with a roadmap-style POV sentence
+7. Edit × N cards:  replace each surviving card body between its
           `<!-- ─────────── Qn START · PATTERN: ... ───────────` and
           `<!-- ─────────── Qn END ─────────── -->` markers.
           Card IDs go q1, q2, … qN; the markdown output groups answers by this id.
-7. Static sanity check BEFORE handing off — you cannot open a browser, so grep
-          the file for these foot-guns instead:
+8. Sanity check BEFORE handing off. If you have browser access (Chrome MCP,
+          Playwright, headless browser, etc.), open the file and verify Mermaid
+          renders, fonts load, and layout holds. Always also grep-check structure:
           - `grep -c 'data-id="q' <file>` matches your intended card count (and IDs are q1…qN sequential)
           - `grep -c '<button[^>]*data-rec="1"' <file>` == card count — every question has exactly one recommended option
-          - For Mermaid cards, eyeball each `<pre class="mermaid">` block against the hard constraints (no `:`, no `"`, no `<`/`>`, basic shapes only)
-          - For font questions, every `font-family` you reference is loaded via the Google Fonts <link> in <head>
           - `data-value="..."` slugs are unique within each card
-8. Hand off.  Give the user the absolute path and ask them to open it in a browser
+          Without browser access, also eyeball-check from source:
+          - Mermaid `<pre class="mermaid">` blocks against the hard constraints (no `:`, no `"`, no `<`/`>`, basic shapes only)
+          - Every `font-family` referenced is loaded via the Google Fonts <link> in <head>
+9. Hand off.  Give the user the absolute path and ask them to open it in a browser
           to verify rendering. On macOS that's `open <path>`; for phone/tablet
           review serve via your project's dev server on LAN. If they spot a
           Mermaid render failure / font fallback / layout issue, fix and re-hand.
@@ -115,7 +120,16 @@ Tags: set `<span class="opt-tags"><span class="opt-tag tag-current">Current</spa
 
 Pick ONE pattern per question. All preset options within one question MUST use the same pattern.
 
-**Live examples**: open `template.en.html` or `template.zh.html` in a browser — each of the 6 demo cards (Q1…Q6) showcases one of the patterns below in the same order. Read the source of the demo card matching the pattern you want and copy its structure.
+| Pattern | Demo card | Use when |
+|---|---|---|
+| #1 UI mockup | Q1 in template | "how it should look" — layout / container / render style |
+| #2 CSS animation | Q2 in template | motion — loading, streaming, transition |
+| #3 Mermaid | Q3 in template | shape of a flow / state / sequence |
+| #4 Font | Q4 in template | typography — body, wordmark, display |
+| #5 Code snippet | Q5 in template | content comparison — same default rendering, different content |
+| #6 Text-only | Q6 in template | no genuine visual angle (last resort) |
+
+Open `template.en.html` or `template.zh.html` and read the matching demo card as the canonical structure to copy from. If none of these 6 fit, invent your own pattern — the preview HTML/CSS goes inside `.opt-preview`; keep the rest of the card structure unchanged. Add a `<!-- PATTERN: ... -->` comment so the next round can spot it.
 
 ### 1. UI mockup (inline HTML/CSS rendering of a tiny real UI)
 Use this when the decision is "how the UI should look" — different layouts, container styles, render styles for the same content. Use real placeholder copy at microscale (~60–70% of real proportions), not gray-bar wireframes (those look like skeleton loaders).
