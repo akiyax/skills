@@ -6,8 +6,8 @@
 
 <table>
 <tr>
-<th width="50%" align="left"><code>grill-me</code> — 聊天里</th>
-<th width="50%" align="left"><code>grill-me-visual</code> — 浏览器里 &nbsp; <a href="https://akiyax.github.io/skills/grill-me-visual/template.zh.html">🚀 试一试</a></th>
+<th width="50%" align="left"><code>grill-me</code> — 对话框中 </th>
+<th width="50%" align="left"><code>grill-me-visual</code> — 浏览器中 &nbsp; <a href="https://akiyax.github.io/skills/grill-me-visual/template.zh.html">🚀 试一试</a></th>
 </tr>
 <tr>
 <td valign="top">
