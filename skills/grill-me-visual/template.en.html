@@ -26,10 +26,14 @@
     --clay-tint:    #F5E6DA;
     --moss:         #4A7A44;
     --rust:         #9D4A3D;
-    /* For Chinese glyphs: serif chain prefers Chinese serif fonts. */
+    /* CJK characters fall through to sans Chinese fonts (PingFang etc.) — Source
+       Serif 4 has no CJK glyphs, so the browser walks the chain until it hits
+       one that does. We deliberately skip Songti / Noto Serif SC: serif CJK in
+       UI reads as 古典/公文. End result: Latin text renders as Source Serif 4
+       (editorial), Chinese text renders as PingFang / Hiragino / YaHei (sans),
+       with the same single `font-family: var(--serif)` declaration everywhere. */
     --serif: "Source Serif 4", "Charter", "Iowan Old Style", Georgia,
-             "Songti SC", "STSong", "SimSun", "宋体", "Noto Serif SC",
-             "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+             "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC",
              serif;
     --sans:  ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
              "Helvetica Neue", Arial,
@@ -66,7 +70,7 @@
   }
   input, textarea { font-size: 16px; }
   body {
-    font-family: var(--sans);
+    font-family: var(--serif);
     font-size: 16px;
     line-height: 1.6;
     color: var(--ink);
@@ -134,7 +138,7 @@
     font-style: normal;
   }
   .lede {
-    font-family: var(--sans);
+    font-family: var(--serif);
     font-size: .93rem;
     line-height: 1.5;
     color: var(--ink-medium);
@@ -171,7 +175,7 @@
   .done-banner .msg { flex: 1; min-width: 0; }
   .done-banner .msg strong {
     display: block;
-    font-family: var(--sans);
+    font-family: var(--serif);
     font-weight: 500;
     font-size: 1.2rem;
     letter-spacing: -.005em;
@@ -179,7 +183,7 @@
     margin-bottom: .2rem;
   }
   .done-banner .msg span {
-    font-family: var(--sans);
+    font-family: var(--serif);
     font-size: .95rem;
     color: var(--ink-medium);
     display: block;
@@ -267,7 +271,7 @@
   .title-group { display: flex; flex-direction: column; gap: .25rem; }
 
   .title-text {
-    font-family: var(--sans);
+    font-family: var(--serif);
     font-weight: 500;
     font-size: 1.32rem;
     line-height: 1.35;
@@ -281,7 +285,7 @@
   }
   .selected-label {
     display: none;
-    font-family: var(--sans);
+    font-family: var(--serif);
     font-size: .95rem;
     color: var(--ink-medium);
   }
@@ -319,7 +323,7 @@
   .card-body > .content { min-width: 0; }
 
   .rec-hint {
-    font-family: var(--sans);
+    font-family: var(--serif);
     color: var(--ink-medium);
     font-size: 1rem;
     line-height: 1.6;
@@ -360,7 +364,7 @@
     background: var(--paper-light);
     border: 1px solid var(--pencil-soft);
     border-radius: 4px;
-    font-family: var(--sans);
+    font-family: var(--serif);
     font-size: 1rem;
     color: var(--ink);
     cursor: pointer;
@@ -379,7 +383,7 @@
     outline-offset: 2px;
   }
   .opt .key {
-    font-family: var(--sans);
+    font-family: var(--serif);
     color: var(--ink-faded);
     font-size: .95rem;
     flex-shrink: 0;
@@ -663,7 +667,7 @@
   }
   .opt-input .key {
     padding: .95rem 0 .95rem 1.15rem;
-    font-family: var(--sans);
+    font-family: var(--serif);
     color: var(--ink-faded);
     font-size: .95rem;
     flex-shrink: 0;
@@ -676,7 +680,7 @@
     border: 0;
     background: transparent;
     color: var(--ink);
-    font-family: var(--sans);
+    font-family: var(--serif);
     font-size: 1rem;
     padding: .95rem .9rem;
   }
@@ -690,7 +694,7 @@
     border-left: 1px solid var(--pencil-soft);
     color: var(--ink-medium);
     padding: 0 1.25rem;
-    font-family: var(--sans);
+    font-family: var(--serif);
     font-size: 1.1rem;
     cursor: pointer;
     transition: all .2s ease;
@@ -787,7 +791,7 @@
   }
   .panel-head h3 {
     margin: 0;
-    font-family: var(--sans);
+    font-family: var(--serif);
     font-weight: 500;
     font-size: 1.05rem;
     letter-spacing: -.005em;
@@ -952,7 +956,7 @@
     background: var(--paper-deep);
     border: 1px solid var(--clay);
     border-radius: 4px;
-    font-family: var(--sans);
+    font-family: var(--serif);
     font-size: .95rem;
     color: var(--ink);
   }
@@ -972,7 +976,7 @@
     background: transparent;
     border: 1px solid var(--ink-faded);
     color: var(--ink);
-    font-family: var(--sans);
+    font-family: var(--serif);
     font-size: .9rem;
     padding: .35rem .9rem;
     border-radius: 4px;
