@@ -1597,7 +1597,6 @@ flowchart TD
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.4/dist/mermaid.min.js"></script>
 <script>
 const TOPIC = "AI chat interface";
 const ROUND = 1;
@@ -1621,8 +1620,18 @@ const LANG = {
   tagRec:         'Recommended',
 };
 
+// Mermaid loader — async-fetches the CDN in parallel with HTML parse so clicks
+// / copy work immediately while it's in flight. Tries CDNs in order; falls back
+// on error. cdnjs (Cloudflare) is primary — reliable globally and reachable from
+// mainland China without VPN — jsdelivr is the fallback. If this round has no
+// <pre class="mermaid">, the CDN is never fetched (see the kick-off below).
 const dark = matchMedia('(prefers-color-scheme: dark)').matches;
-mermaid.initialize({
+const MERMAID_VERSION = '10.9.4';
+const MERMAID_CDNS = [
+  `https://cdnjs.cloudflare.com/ajax/libs/mermaid/${MERMAID_VERSION}/mermaid.min.js`,
+  `https://cdn.jsdelivr.net/npm/mermaid@${MERMAID_VERSION}/dist/mermaid.min.js`,
+];
+const mermaidConfig = {
   startOnLoad: false,
   theme: 'base',
   flowchart: { htmlLabels: false, useMaxWidth: true },
@@ -1641,7 +1650,26 @@ mermaid.initialize({
     signalColor:        dark ? '#DBD4C2' : '#5B5650',
     signalTextColor:    dark ? '#FAF4E2' : '#1A1916',
   }
-});
+};
+const loadMermaid = (i = 0) => {
+  if (i >= MERMAID_CDNS.length) {
+    document.querySelectorAll('pre.mermaid:not([data-processed])').forEach(el => {
+      el.dataset.failed = '1';
+      el.textContent = '[mermaid CDN unreachable — diagram not rendered]';
+    });
+    return;
+  }
+  const s = document.createElement('script');
+  s.src = MERMAID_CDNS[i];
+  s.async = true;
+  s.onload = () => {
+    mermaid.initialize(mermaidConfig);
+    // Render any card already expanded by the time mermaid arrived.
+    cards.filter(c => c.dataset.open === '1').forEach(ensureMermaid);
+  };
+  s.onerror = () => loadMermaid(i + 1);
+  document.head.appendChild(s);
+};
 
 const cards = [...document.querySelectorAll('#questions .card')];
 
@@ -1666,6 +1694,7 @@ for (const recBtn of document.querySelectorAll('.opt[data-rec="1"]')) {
 // Lazy mermaid render — collapsed cards have 0 width so mermaid renders at micro-scale.
 // Render each card's diagrams the first time it opens.
 const ensureMermaid = (card) => {
+  if (typeof mermaid === 'undefined') return; // CDN still in flight; loadMermaid's onload will render open cards on arrival.
   const fresh = card.querySelectorAll('pre.mermaid:not([data-processed])');
   if (!fresh.length) return;
   mermaid.run({ nodes: [...fresh] }).catch(err => {
@@ -1678,9 +1707,10 @@ const ensureMermaid = (card) => {
     });
   });
 };
-// Boot — only Q1 is open initially.
-const firstOpen = cards.find(c => c.dataset.open === '1');
-if (firstOpen) ensureMermaid(firstOpen);
+// Kick off mermaid fetch eagerly when this round actually has diagrams, so it's
+// ready by the time the user clicks the card. Rounds with no mermaid pattern
+// never hit the CDN.
+if (document.querySelector('pre.mermaid')) loadMermaid();
 
 const answers = {};
 const mdOut = document.getElementById('md-out');
