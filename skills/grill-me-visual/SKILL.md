@@ -87,10 +87,11 @@ The template is a single HTML file (~1900 lines, ~75 KB, roughly 20–25k tokens
           Without browser access, also eyeball-check from source:
           - Mermaid `<pre class="mermaid">` blocks against the hard constraints (no `:`, no `"`, no `<`/`>`, basic shapes only)
           - Every `font-family` referenced is loaded via the Google Fonts <link> in <head>
-9. Hand off.  Give the user the absolute path and ask them to open it in a browser
-          to verify rendering. On macOS that's `open <path>`; for phone/tablet
-          review serve via your project's dev server on LAN. If they spot a
-          Mermaid render failure / font fallback / layout issue, fix and re-hand.
+9. Hand off.  Best-effort: launch the file in the user's default browser (skip
+          silently if headless / no GUI). Then output ONE clickable markdown
+          link from the user's CWD — `[<filename>](<relative-path>)` — as the
+          re-open handle. No absolute path, no separate command line. If the
+          user reports a Mermaid / font / layout issue, fix and re-hand.
 ```
 
 **Do not touch:**
