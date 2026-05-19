@@ -9,7 +9,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,500;1,8..60,600&family=Manrope:wght@400;500;600&family=Playfair+Display:wght@400;600;700;900&family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..700,0..100,0..1&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,500;1,8..60,600&family=Playfair+Display:wght@400;600;700;900&family=Fraunces:opsz,wght,SOFT,WONK@9..144,400..700,0..100,0..1&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
   :root {
@@ -66,7 +66,7 @@
   }
   input, textarea { font-size: 16px; }
   body {
-    font-family: var(--serif);
+    font-family: var(--sans);
     font-size: 16px;
     line-height: 1.6;
     color: var(--ink);
@@ -134,8 +134,7 @@
     font-style: normal;
   }
   .lede {
-    font-family: var(--serif);
-    font-style: italic;
+    font-family: var(--sans);
     font-size: .93rem;
     line-height: 1.5;
     color: var(--ink-medium);
@@ -172,7 +171,7 @@
   .done-banner .msg { flex: 1; min-width: 0; }
   .done-banner .msg strong {
     display: block;
-    font-family: var(--serif);
+    font-family: var(--sans);
     font-weight: 500;
     font-size: 1.2rem;
     letter-spacing: -.005em;
@@ -180,8 +179,7 @@
     margin-bottom: .2rem;
   }
   .done-banner .msg span {
-    font-family: var(--serif);
-    font-style: italic;
+    font-family: var(--sans);
     font-size: .95rem;
     color: var(--ink-medium);
     display: block;
@@ -269,7 +267,7 @@
   .title-group { display: flex; flex-direction: column; gap: .25rem; }
 
   .title-text {
-    font-family: var(--serif);
+    font-family: var(--sans);
     font-weight: 500;
     font-size: 1.32rem;
     line-height: 1.35;
@@ -283,8 +281,7 @@
   }
   .selected-label {
     display: none;
-    font-family: var(--serif);
-    font-style: italic;
+    font-family: var(--sans);
     font-size: .95rem;
     color: var(--ink-medium);
   }
@@ -322,8 +319,7 @@
   .card-body > .content { min-width: 0; }
 
   .rec-hint {
-    font-family: var(--serif);
-    font-style: italic;
+    font-family: var(--sans);
     color: var(--ink-medium);
     font-size: 1rem;
     line-height: 1.6;
@@ -364,7 +360,7 @@
     background: var(--paper-light);
     border: 1px solid var(--pencil-soft);
     border-radius: 4px;
-    font-family: var(--serif);
+    font-family: var(--sans);
     font-size: 1rem;
     color: var(--ink);
     cursor: pointer;
@@ -383,8 +379,7 @@
     outline-offset: 2px;
   }
   .opt .key {
-    font-family: var(--serif);
-    font-style: italic;
+    font-family: var(--sans);
     color: var(--ink-faded);
     font-size: .95rem;
     flex-shrink: 0;
@@ -446,7 +441,6 @@
     background: var(--paper);
     border-bottom: 1px solid var(--pencil-soft);
     color: var(--ink-medium);
-    font-style: italic;
     font-size: .92rem;
     transition: background .22s ease;
   }
@@ -669,8 +663,7 @@
   }
   .opt-input .key {
     padding: .95rem 0 .95rem 1.15rem;
-    font-family: var(--serif);
-    font-style: italic;
+    font-family: var(--sans);
     color: var(--ink-faded);
     font-size: .95rem;
     flex-shrink: 0;
@@ -683,14 +676,13 @@
     border: 0;
     background: transparent;
     color: var(--ink);
-    font-family: var(--serif);
+    font-family: var(--sans);
     font-size: 1rem;
     padding: .95rem .9rem;
   }
   .opt-input input:focus { outline: 0; }
   .opt-input input::placeholder {
     color: var(--ink-faded);
-    font-style: italic;
   }
   .opt-input .confirm {
     background: transparent;
@@ -698,7 +690,7 @@
     border-left: 1px solid var(--pencil-soft);
     color: var(--ink-medium);
     padding: 0 1.25rem;
-    font-family: var(--serif);
+    font-family: var(--sans);
     font-size: 1.1rem;
     cursor: pointer;
     transition: all .2s ease;
@@ -795,7 +787,7 @@
   }
   .panel-head h3 {
     margin: 0;
-    font-family: var(--serif);
+    font-family: var(--sans);
     font-weight: 500;
     font-size: 1.05rem;
     letter-spacing: -.005em;
@@ -960,14 +952,13 @@
     background: var(--paper-deep);
     border: 1px solid var(--clay);
     border-radius: 4px;
-    font-family: var(--serif);
+    font-family: var(--sans);
     font-size: .95rem;
     color: var(--ink);
   }
   .warn-row[data-show="1"] { display: flex; }
   .warn-row .msg {
     flex: 1;
-    font-style: italic;
   }
   .warn-row .msg b {
     font-style: normal;
@@ -981,8 +972,7 @@
     background: transparent;
     border: 1px solid var(--ink-faded);
     color: var(--ink);
-    font-family: var(--serif);
-    font-style: italic;
+    font-family: var(--sans);
     font-size: .9rem;
     padding: .35rem .9rem;
     border-radius: 4px;
