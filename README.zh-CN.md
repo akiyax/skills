@@ -36,24 +36,6 @@
 </tr>
 </table>
 
-## 安装
-
-**A. skills CLI**(推荐)
-
-自动识别你正在用的 agent(Claude Code / Cursor / Codex / Gemini CLI / OpenCode 等)并安装到对应位置。
-
-```bash
-npx skills add akiyax/skills --skill grill-me-visual -g -y
-```
-
-**B. Claude Code plugin marketplace**
-
-```
-/plugin marketplace add akiyax/skills
-/plugin install grill-me-visual@akiyax-skills
-```
-
-
 ## 介绍
 
 [`grill-me`](https://github.com/mattpocock/skills/blob/main/skills/productivity/grill-me/SKILL.md) 是一个极佳的 skill。但是，如果你在使用 [`grill-me`](https://github.com/mattpocock/skills/blob/main/skills/productivity/grill-me/SKILL.md) 或者  [`brainstorm`](https://github.com/obra/superpowers/blob/main/skills/brainstorming/SKILL.md)，你可能会遇到：
@@ -78,3 +60,20 @@ npx skills add akiyax/skills --skill grill-me-visual -g -y
 
 > [!WARNING]
 > **这不是一个轻量 skill。** 尽管已经做了大量节约 token 的工作，agent 通常仍然需要几分钟才能创建完 HTML 文件。使用前请权衡这些决策是否值得时间/Token用量。
+
+## 安装
+
+**A. skills CLI**(推荐)
+
+自动识别你正在用的 agent(Claude Code / Cursor / Codex / Gemini CLI / OpenCode 等)并安装到对应位置。
+
+```bash
+npx skills add akiyax/skills --skill grill-me-visual -g -y
+```
+
+**B. Claude Code plugin marketplace**
+
+```
+/plugin marketplace add akiyax/skills
+/plugin install grill-me-visual@akiyax-skills
+```

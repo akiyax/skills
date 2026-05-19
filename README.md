@@ -36,24 +36,6 @@ How assistant replies appear on screen — sets the overall "conversation" vs "d
 </tr>
 </table>
 
-## Install
-
-**A. skills CLI** *(recommended)*
-
-Auto-detects which agent you're running (Claude Code, Cursor, Codex, Gemini CLI, OpenCode, etc.) and installs to the right location.
-
-```bash
-npx skills add akiyax/skills --skill grill-me-visual -g -y
-```
-
-**B. Claude Code plugin marketplace**
-
-```
-/plugin marketplace add akiyax/skills
-/plugin install grill-me-visual@akiyax-skills
-```
-
-
 ## About
 
 [`grill-me`](https://github.com/mattpocock/skills/blob/main/skills/productivity/grill-me/SKILL.md) is a great skill. But if you're using [`grill-me`](https://github.com/mattpocock/skills/blob/main/skills/productivity/grill-me/SKILL.md) or [`brainstorm`](https://github.com/obra/superpowers/blob/main/skills/brainstorming/SKILL.md), you might run into:
@@ -78,3 +60,20 @@ When you're done, paste the Q&A summary back into chat to continue.
 
 > [!WARNING]
 > **Not a lightweight skill.** Despite token-saving measures, the agent still typically takes a few minutes to assemble the HTML file. Weigh whether the decisions are worth the time/token cost before invoking.
+
+## Install
+
+**A. skills CLI** *(recommended)*
+
+Auto-detects which agent you're running (Claude Code, Cursor, Codex, Gemini CLI, OpenCode, etc.) and installs to the right location.
+
+```bash
+npx skills add akiyax/skills --skill grill-me-visual -g -y
+```
+
+**B. Claude Code plugin marketplace**
+
+```
+/plugin marketplace add akiyax/skills
+/plugin install grill-me-visual@akiyax-skills
+```
